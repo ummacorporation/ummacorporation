@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UMMA | United Mothers for Milk Association</title>
+<style><link rel="stylesheet" href="UMMAS STYLE.css"></style>
+</head>
+<body>
+
+<!-- Navbar Header -->
+<header>
+    <div class="logo">UMMA<span>United Mothers for Milk Association</span></div>
+</header>
+
+<!-- Hero Section with Sky Backdrop & Splash Silhouette Concept -->
+<section class="hero-section">
+    <div class="hero-content">
+        <h1>United Mothers for Milk Association</h1>
+        <p>Connecting mothers across our community for safe, reliable milk donation and distribution. Click on a milk category below to view specific products and verified supply centers.</p>
+    </div>
+</section>
+
+<!-- Main Grid Categories Section -->
+<main class="main-content">
+    <div class="main-content-wrapper">
+        <div class="section-title">Explore Milk Variants</div>
+        <div class="section-subtitle">Click a card to see available products, verified suppliers, ratings, and order parameters.</div>
+        
+        <div class="cards-grid">
+            <!-- Variant Card 1 -->
+            <div class="category-card standard" onclick="showProducts('standard')">
+                <div class="category-image">🥛</div>
+                <h3 class="category-name">Standard Pasteurized</h3>
+                <p class="category-desc">Thoroughly screened, pasteurized, and frozen breast milk batches calibrated for essential daily nutrition support.</p>
+                <span class="view-products-text">View Products & Shops →</span>
+            </div>
+
+            <!-- Variant Card 2 -->
+            <div class="category-card colostrum" onclick="showProducts('colostrum')">
+                <div class="category-image">💛</div>
+                <h3 class="category-name">Colostrum Care Packs</h3>
+                <p class="category-desc">Early-stage milk packed with essential antibodies. Handled strictly for premature or newborn infants.</p>
+                <span class="view-products-text" style="color:#D48806;">View Products & Shops →</span>
+            </div>
+
+            <!-- Variant Card 3 -->
+            <div class="category-card allergen" onclick="showProducts('allergen')">
+                <div class="category-image">🌸</div>
+                <h3 class="category-name">Dairy-Free Premium</h3>
+                <p class="category-desc">Sourced exclusively from verified donor mothers maintaining absolute dairy-free profiles for sensitive stomachs.</p>
+                <span class="view-products-text" style="color:#E25C80;">View Products & Shops →</span>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+<!-- INTERACTIVE DETAILED PRODUCTS POPUP MODAL -->
+<div class="modal-overlay" id="productsModal">
+    <div class="products-popup">
+        <div class="popup-header">
+            <h3 class="popup-title" id="modalTitle">Available Products</h3>
+            <span class="close-popup" onclick="closePopup()">&times;</span>
+        </div>
+        <div class="popup-body" id="modalProductList">
+            <!-- Dynamic products inject here based on category click -->
+        </div>
+    </div>
+</div>
+
+
+<!-- GRAB SIDE DRAWER CHECKOUT SYSTEM -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="dismissDrawerToProducts()"></div>
+
+<div class="grab-side-drawer" id="grabDrawer">
+    <div class="drawer-header">
+        <h2 class="drawer-title">UMMA Order Request</h2>
+        <span class="close-drawer" id="closeDrawerBtn" onclick="dismissDrawerToProducts()">&times;</span>
+    </div>
+
+    <div class="drawer-body">
+        <form id="ummaForm">
+            <div class="grab-field">
+                <label>Business / Network Type</label>
+                <select id="businessTypeSelect" required>
+                    <option value="Milk Receiver">Milk Receiver</option>
+                    <option value="Milk Donor">Milk Donor</option>
+                </select>
+            </div>
+
+            <div class="grab-field">
+                <label>Full Name</label>
+                <input type="text" placeholder="Enter full name" required>
+            </div>
+
+            <div class="grab-field">
+                <label>Phone Number</label>
+                <input type="tel" placeholder="09XXXXXXXXX" required>
+            </div>
+
+            <div class="grab-field">
+                <label>Home Address (Delivery Location)</label>
+                <textarea rows="2" placeholder="Enter complete home address" required></textarea>
+            </div>
+
+            <div class="grab-field">
+                <label>Milk Quantity (Liters)</label>
+                <input type="number" min="0.1" step="0.1" value="1" required>
+            </div>
+
+            <div class="grab-field">
+                <label>Selected Product Details</label>
+                <textarea id="checkoutProductDetails" rows="3" readonly style="background-color: #F4F8FC; border-color: #EAEFF5; cursor: not-allowed;"></textarea>
+            </div>
+        </form>
+    </div>
+
+    <div class="drawer-footer">
+        <button type="submit" form="ummaForm" class="grab-submit-btn">Confirm Association Request</button>
+    </div>
+</div>
+
+<script>
+// Database with visual items and descriptive details
+const productDatabase = {
+    standard: [
+        { 
+            name: "Pasteurized Milk Pack (Standard 500ml)", 
+            shop: "Metro Maternal Health Center", 
+            rating: "4.8", 
+            reviews: 124,
+            image: "https://images.squarespace-cdn.com/content/v1/5c65a4e0b91449610be76a7f/1613167703016-BXM6O2VWRUOO3CVLNC9O/brick+storage.png",
+            description: "Deep-frozen flat storage packets screened for pathogens. Optimized for general infant supplement schedules."
+        },
+        { 
+            name: "Screened Frozen Batch (1L Bag)", 
+            shop: "St. Luke Infant Human Milk Bank", 
+            rating: "4.9", 
+            reviews: 98,
+            image: "https://images.squarespace-cdn.com/content/v1/5c65a4e0b91449610be76a7f/1613167703016-BXM6O2VWRUOO3CVLNC9O/brick+storage.png",
+            description: "Thoroughly analyzed pooled donor milk offering balanced nutritional and mineral content."
+        }
+    ],
+    colostrum: [
+        { 
+            name: "Premium Newborn Colostrum Syringe", 
+            shop: "UMMA Central Hub Clinic", 
+            rating: "5.0", 
+            reviews: 42,
+            image: "http://nourishy.com.au/cdn/shop/articles/Nourishy-Expressing-Colostrum-1_50e0d8c9-dd99-438e-85c1-a5866edd421b.png?v=1760960999",
+            description: "Concentrated early-stage liquid amber fluid containing targeted maternal antibodies for immediate gut protection."
+        },
+        { 
+            name: "First-Stage Neonatal Care Pack", 
+            shop: "City Children's Hospital Hub", 
+            rating: "4.7", 
+            reviews: 19,
+            image: "http://nourishy.com.au/cdn/shop/articles/Nourishy-Expressing-Colostrum-1_50e0d8c9-dd99-438e-85c1-a5866edd421b.png?v=1760960999",
+            description: "Pre-measured sterile storage syringe units explicitly reserved for critical premature infant intensive wellness needs."
+        }
+    ],
+    allergen: [
+        { 
+            name: "Strict Non-Dairy Screened Premium", 
+            shop: "Blessed Cradle Milk Depot", 
+            rating: "4.9", 
+            reviews: 63,
+            image: "https://ph-test-11.slatic.net/p/22d8d601a76d811d0d9c57e4bb88493c.jpg",
+            description: "Sourced from mothers on monitored dairy-free diets. Prevents systemic discomfort or gas for babies with severe CMPA."
+        },
+        { 
+            name: "Hypoallergenic Certified Mother's Milk", 
+            shop: "Metro Maternal Health Center", 
+            rating: "4.6", 
+            reviews: 31,
+            image: "https://ph-test-11.slatic.net/p/22d8d601a76d811d0d9c57e4bb88493c.jpg",
+            description: "Clean profile maternal milk entirely free from common allergens, preserving natural digestive comfort."
+        }
+    ]
+};
+
+const modal = document.getElementById("productsModal");
+const modalTitle = document.getElementById("modalTitle");
+const modalProductList = document.getElementById("modalProductList");
+const drawer = document.getElementById("grabDrawer");
+const drawerOverlay = document.getElementById("drawerOverlay");
+const checkoutProductDetails = document.getElementById("checkoutProductDetails");
+
+let currentActiveCategory = ""; 
+
+function showProducts(category) {
+    currentActiveCategory = category;
+    let titleText = "";
+    if(category === 'standard') titleText = "Standard Pasteurized Products";
+    if(category === 'colostrum') titleText = "Colostrum Care Supply Packs";
+    if(category === 'allergen') titleText = "Dairy-Free / Allergen-Safe Products";
+    
+    modalTitle.innerText = titleText;
+    modalProductList.innerHTML = ""; 
+
+    productDatabase[category].forEach((prod, index) => {
+        const itemHTML = `
+            <div class="shop-product-item">
+                <div class="product-meta-block">
+                    <img src="${prod.image}" alt="${prod.name}" class="product-thumbnail-frame">
+                    <div class="shop-info-row">
+                        <div class="shop-details">
+                            <h4>${prod.name}</h4>
+                            <p>Supplied by: <span class="source-shop">${prod.shop}</span></p>
+                            <p class="product-caption-desc">${prod.description}</p>
+                        </div>
+                        <div class="rating-container">
+                            <span class="star-badge" id="rating-text-${category}-${index}">⭐ ${prod.rating} (${prod.reviews})</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="action-buttons-row">
+                    <button class="rate-btn" onclick="submitUserRating('${category}', ${index})">Rate Shop</button>
+                    <button class="order-btn" onclick="initiateCheckout('${prod.name}', '${prod.shop}')">Order Button</button>
+                </div>
+            </div>
+        `;
+        modalProductList.innerHTML += itemHTML;
+    });
+
+    modal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+}
+
+function closePopup() {
+    modal.style.display = "none";
+    document.body.style.overflow = "auto";
+}
+
+function submitUserRating(category, index) {
+    const target = productDatabase[category][index];
+    const userRating = prompt(`Rate your experience with ${target.shop} (1 to 5 Stars):`, "5");
+    
+    if (userRating !== null) {
+        const numericRating = parseFloat(userRating);
+        if (numericRating >= 1 && numericRating <= 5) {
+            const newTotalReviews = target.reviews + 1;
+            const newAvgRating = ((parseFloat(target.rating) * target.reviews) + numericRating) / newTotalReviews;
+            
+            target.reviews = newTotalReviews;
+            target.rating = newAvgRating.toFixed(1);
+            
+            document.getElementById(`rating-text-${category}-${index}`).innerText = `⭐ ${target.rating} (${target.reviews})`;
+            alert(`Thank you for rating ${target.shop}!`);
+        } else {
+            alert("Invalid option. Please input an integer number value between 1 and 5.");
+        }
+    }
+}
+
+function initiateCheckout(productName, shopName) {
+    modal.style.display = "none"; 
+    checkoutProductDetails.value = `Product: ${productName}\nSource Facility: ${shopName}`;
+    
+    drawerOverlay.style.display = "block";
+    setTimeout(() => { drawer.classList.add("open"); }, 10);
+}
+
+function dismissDrawerToProducts() {
+    drawer.classList.remove("open");
+    setTimeout(() => { 
+        drawerOverlay.style.display = "none"; 
+        if (currentActiveCategory) {
+            showProducts(currentActiveCategory);
+        }
+    }, 300);
+}
+</script>
+
+</body>
+</html>
