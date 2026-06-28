@@ -52,8 +52,43 @@
         .logo-container:hover .logo-graphic {
             transform: scale(1.06);
         }
-        .logo { font-size: 28px; font-weight: 900; color: #112A61; display: flex; align-items: center; }
-        .logo span { font-size: 14px; font-weight: 600; color: #E25C80; margin-left: 10px; background: #FFF0F3; padding: 4px 10px; border-radius: 20px; }
+        .logo { 
+            font-size: 28px; 
+            font-weight: 900; 
+            color: #112A61; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            letter-spacing: -0.5px;
+        }
+        
+        /* STYLISH KOREAN VERSION DESIGN PROPERTIES */
+        .logo .korean-divider {
+            color: #CBD5E1;
+            font-weight: 300;
+            font-size: 24px;
+            margin: 0 -2px;
+        }
+        .logo .korean-text { 
+            font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+            font-size: 23px; 
+            font-weight: 800; 
+            color: #E25C80; 
+            letter-spacing: -0.5px;
+            text-shadow: 1px 1px 0px rgba(226, 92, 128, 0.1);
+            position: relative;
+        }
+        
+        .logo span.subtitle-badge { 
+            font-size: 13px; 
+            font-weight: 600; 
+            color: #4A90E2; 
+            background: #EDF5FF; 
+            padding: 5px 12px; 
+            border-radius: 20px; 
+            letter-spacing: 0px;
+            margin-left: 4px;
+        }
         .header-donor-btn { background: #4A90E2; color: white; border: none; padding: 10px 20px; font-weight: 700; border-radius: 20px; cursor: pointer; transition: all 0.3s ease; }
         .header-donor-btn:hover { background: #357ABD; transform: translateY(-1px); }
 
@@ -83,7 +118,6 @@
             border-color: #D6E4F0;
         }
 
-        /* Rounded, ultra-smooth color accent strips matching card border radii */
         .category-card::before { 
             content: ''; 
             position: absolute; 
@@ -96,7 +130,7 @@
             transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1);
         }
         .category-card:hover::before {
-            width: 8px; /* Smooth feedback widening expansion on hover */
+            width: 8px; 
         }
         .category-card.standard::before { background: #4A90E2; }
         .category-card.colostrum::before { background: #F5A623; }
@@ -406,6 +440,11 @@
         .drawer-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(3px); z-index: 2500; transition: opacity 0.3s ease; }
 
         @media(max-width: 768px) {
+            header { padding: 16px 20px; }
+            .logo { font-size: 24px; }
+            .logo .korean-divider { font-size: 20px; }
+            .logo .korean-text { font-size: 19px; }
+            .logo span.subtitle-badge { display: none; } /* Hide sub-label on small mobile views to protect layout integrity */
             .directory-layout { flex-direction: column; }
             .directory-map-graphic { min-width: 100%; }
             .product-meta-block { flex-direction: column; align-items: center; text-align: center; }
@@ -425,7 +464,13 @@
             <path d="M50,20 C35,40 35,60 50,80 C65,60 65,40 50,20 Z" fill="#E25C80"/>
             <circle cx="50" cy="45" r="6" fill="#FFFFFF"/>
         </svg>
-        <div class="logo">UMMA<span>United Mothers for Milk Association</span></div>
+        <!-- Updated branding with English brand, structural layout divider, and premium styled Korean variant -->
+        <div class="logo">
+            UMMA 
+            <div class="korean-divider">|</div> 
+            <div class="korean-text">엄마</div>
+            <span class="subtitle-badge">United Mothers for Milk Association</span>
+        </div>
     </div>
     <button class="header-donor-btn" onclick="openDonorDrawer()">Be a Milk Donor</button>
 </header>
