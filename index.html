@@ -211,6 +211,7 @@
         .pin-central { background: #38BDF8; }
         .pin-metro { background: #E25C80; }
         .pin-blessed { background: #F5A623; }
+        .pin-delivery { background: #E25C80; border-color: #FFFFFF; }
 
         .live-core-pin.is-focused {
             transform: scale(1.5);
@@ -413,8 +414,8 @@
         .grab-side-drawer { 
             position: fixed; 
             top: 0; 
-            right: -460px; 
-            width: 460px; 
+            right: -480px; 
+            width: 480px; 
             height: 100%; 
             background: #fff; 
             z-index: 3000; 
@@ -431,6 +432,24 @@
         .grab-field label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 6px; color: #112A61; }
         .grab-field input, .grab-field textarea { width: 100%; padding: 11px; border: 2px solid #EAEFF5; border-radius: 8px; font-size: 14px; transition: border-color 0.2s ease; }
         .grab-field input:focus, .grab-field textarea:focus { border-color: #4A90E2; outline: none; }
+        
+        /* MINI MAP CONTAINER IN ORDER REQUEST FORM */
+        .form-map-container {
+            width: 100%;
+            height: 200px;
+            border-radius: 12px;
+            border: 3px solid #0F172A;
+            margin-top: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+        .map-hint-text {
+            font-size: 12px;
+            color: #64748B;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
         .grab-field-checkbox { display: flex; align-items: flex-start; gap: 8px; margin-top: 12px; }
         .grab-field-checkbox input { margin-top: 3px; width: auto; }
         .grab-field-checkbox label { font-size: 13px; color: #4A5568; line-height: 1.4; font-weight: normal; }
@@ -444,7 +463,7 @@
             .logo { font-size: 24px; }
             .logo .korean-divider { font-size: 20px; }
             .logo .korean-text { font-size: 19px; }
-            .logo span.subtitle-badge { display: none; } /* Hide sub-label on small mobile views to protect layout integrity */
+            .logo span.subtitle-badge { display: none; }
             .directory-layout { flex-direction: column; }
             .directory-map-graphic { min-width: 100%; }
             .product-meta-block { flex-direction: column; align-items: center; text-align: center; }
@@ -458,13 +477,11 @@
 
 <header>
     <div class="logo-container">
-        <!-- Brand logo graphic vector framework -->
         <svg class="logo-graphic" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
             <circle cx="50" cy="50" r="46" fill="none" stroke="#E25C80" stroke-width="8"/>
             <path d="M50,20 C35,40 35,60 50,80 C65,60 65,40 50,20 Z" fill="#E25C80"/>
             <circle cx="50" cy="45" r="6" fill="#FFFFFF"/>
         </svg>
-        <!-- Updated branding with English brand, structural layout divider, and premium styled Korean variant -->
         <div class="logo">
             UMMA 
             <div class="korean-divider">|</div> 
@@ -580,8 +597,20 @@
         <form id="ummaReceiverForm">
             <div class="grab-field"><label>Full Name</label><input type="text" placeholder="Enter full name" required></div>
             <div class="grab-field"><label>Phone Number</label><input type="tel" placeholder="09XXXXXXXXX" required></div>
-            <div class="grab-field"><label>Home Address</label><textarea rows="2" placeholder="Enter complete address" required></textarea></div>
-            <div class="grab-field"><label>Milk Quantity Needed (Liters)</label><input type="number" min="0.1" step="0.1" value="1" required></div>
+            
+            <!-- LIVE PIN ADDRESS GEOLOCATION FRAME -->
+            <div class="grab-field">
+                <label>Home Delivery Address & Pin</label>
+                <textarea id="deliveryAddressText" rows="2" placeholder="Enter address or tap the map below to pinpoint exact delivery coordinates" required></textarea>
+                <div class="form-map-container" id="deliveryFormMap"></div>
+                <div class="map-hint-text">💡 Tap or drag anywhere on the map above to accurately pin your location.</div>
+            </div>
+            
+            <div class="grab-field">
+                <label id="quantityFieldLabel">Milk Quantity Needed (Pouches)</label>
+                <input type="number" id="orderQuantityInput" min="1" step="1" value="1" required>
+            </div>
+            
             <div class="grab-field"><label>Selected Product</label><textarea id="checkoutProductDetails" rows="3" readonly style="background-color: #F4F8FC; border-color: #EAEFF5; cursor: not-allowed;"></textarea></div>
         </form>
     </div>
@@ -609,13 +638,13 @@
 <script>
 const productDatabase = {
     standard: [
-        { name: "Pasteurized Milk Pack (Standard 500ml)", shop: "Metro Maternal Health Center", rating: 4.8, reviews: 124, image: "https://images.squarespace-cdn.com/content/v1/5c65a4e0b91449610be76a7f/1613167703016-BXM6O2VWRUOO3CVLNC9O/brick+storage.png", description: "Deep-frozen flat storage packets screened for pathogens." }
+        { name: "Pasteurized Milk Pack (Standard 500ml)", shop: "Metro Maternal Health Center", rating: 4.8, reviews: 124, image: "https://images.squarespace-cdn.com/content/v1/5c65a4e0b91449610be76a7f/1613167703016-BXM6O2VWRUOO3CVLNC9O/brick+storage.png", description: "Deep-frozen flat storage packets screened for pathogens.", unit: "Pouches" }
     ],
     colostrum: [
-        { name: "Premium Newborn Colostrum Syringe", shop: "UMMA Central Hub Clinic", rating: 5.0, reviews: 42, image: "http://nourishy.com.au/cdn/shop/articles/Nourishy-Expressing-Colostrum-1_50e0d8c9-dd99-438e-85c1-a5866edd421b.png?v=1760960999", description: "Concentrated early-stage liquid amber fluid containing targeted maternal antibodies." }
+        { name: "Premium Newborn Colostrum Syringe", shop: "UMMA Central Hub Clinic", rating: 5.0, reviews: 42, image: "http://nourishy.com.au/cdn/shop/articles/Nourishy-Expressing-Colostrum-1_50e0d8c9-dd99-438e-85c1-a5866edd421b.png?v=1760960999", description: "Concentrated early-stage liquid amber fluid containing targeted maternal antibodies.", unit: "Syringes" }
     ],
     allergen: [
-        { name: "Strict Non-Dairy Screened Premium", shop: "Blessed Cradle Milk Depot", rating: 4.9, reviews: 63, image: "https://ph-test-11.slatic.net/p/22d8d601a76d811d0d9c57e4bb88493c.jpg", description: "Sourced from mothers on monitored dairy-free diets." }
+        { name: "Strict Non-Dairy Screened Premium Bulk", shop: "Blessed Cradle Milk Depot", rating: 4.9, reviews: 63, image: "https://ph-test-11.slatic.net/p/22d8d601a76d811d0d9c57e4bb88493c.jpg", description: "Sourced from mothers on monitored dairy-free diets.", unit: "Liters" }
     ]
 };
 
@@ -625,10 +654,12 @@ const locations = {
     blessed: { coords: [14.5378, 121.0112], name: "Blessed Cradle Milk Depot", zoom: 17 }
 };
 
-let map;
+let map, deliveryMap;
 let mapMarkers = {};
+let deliveryMarker = null;
 
 document.addEventListener("DOMContentLoaded", () => {
+    // Primary Interactive Hub Earth Map initialization
     map = L.map('liveSatelliteMap', {
         zoomControl: false,
         attributionControl: false
@@ -661,7 +692,51 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const firstOption = document.querySelector('.directory-item');
     if (firstOption) focusLiveHub(firstOption, 'central');
+
+    // Initialize the Delivery Location Form Map module ahead of viewport reveals
+    initDeliveryFormMap();
 });
+
+function initDeliveryFormMap() {
+    deliveryMap = L.map('deliveryFormMap', {
+        zoomControl: true,
+        attributionControl: false
+    }).setView([14.5600, 121.0300], 13);
+
+    // UPDATED: Now uses the exact same ArcGIS World Imagery tile layer as the primary supply dashboard map
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 19
+    }).addTo(deliveryMap);
+
+    const deliveryIcon = L.divIcon({
+        className: 'custom-leaflet-marker-node',
+        html: `<div class="live-core-pin pin-delivery"><div class="pulse-radar-wave" style="background:rgba(226,92,128,0.4)"></div></div>`,
+        iconSize: [20, 20],
+        iconAnchor: [10, 10]
+    });
+
+    // Capture map click event to drop and relocate pins accurately
+    deliveryMap.on('click', (e) => {
+        const { lat, lng } = e.latlng;
+        updateDeliveryCoordinates(lat, lng, deliveryIcon);
+    });
+}
+
+function updateDeliveryCoordinates(lat, lng, icon) {
+    const coordString = `📍 Pinpoint Coordinates: [Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}]`;
+    document.getElementById('deliveryAddressText').value = coordString;
+
+    if (!deliveryMarker) {
+        deliveryMarker = L.marker([lat, lng], { icon: icon, draggable: true }).addTo(deliveryMap);
+        deliveryMarker.on('dragend', () => {
+            const position = deliveryMarker.getLatLng();
+            updateDeliveryCoordinates(position.lat, position.lng, icon);
+        });
+    } else {
+        deliveryMarker.setLatLng([lat, lng]);
+    }
+    deliveryMap.panTo([lat, lng]);
+}
 
 function focusLiveHub(element, key) {
     document.querySelectorAll('.directory-item').forEach(item => item.classList.remove('active'));
@@ -704,6 +779,8 @@ const receiverDrawer = document.getElementById("receiverDrawer");
 const donorDrawer = document.getElementById("donorDrawer");
 const drawerOverlay = document.getElementById("drawerOverlay");
 const checkoutProductDetails = document.getElementById("checkoutProductDetails");
+const quantityFieldLabel = document.getElementById("quantityFieldLabel");
+const orderQuantityInput = document.getElementById("orderQuantityInput");
 let currentActiveCategory = ""; 
 let currentlyOpenDrawer = null;
 
@@ -731,7 +808,7 @@ function showProducts(category) {
                 </div>
                 <div class="action-buttons-row">
                     <button class="rate-btn" onclick="submitUserRating('${category}', ${index})">Rate Shop</button>
-                    <button class="order-btn" onclick="initiateCheckout('${prod.name}', '${prod.shop}')">Buy</button>
+                    <button class="order-btn" onclick="initiateCheckout('${prod.name}', '${prod.shop}', '${prod.unit}')">Buy</button>
                 </div>
             </div>
         `;
@@ -763,12 +840,36 @@ function submitUserRating(category, index) {
 
 function closePopup() { modal.style.display = "none"; document.body.style.overflow = "auto"; }
 
-function initiateCheckout(productName, shopName) {
+function initiateCheckout(productName, shopName, unitType) {
     modal.style.display = "none"; 
     checkoutProductDetails.value = `Product: ${productName}\nSource Facility: ${shopName}`;
+    
+    quantityFieldLabel.innerText = `Milk Quantity Needed (${unitType})`;
+    
+    if (unitType === "Liters") {
+        orderQuantityInput.setAttribute("min", "0.1");
+        orderQuantityInput.setAttribute("step", "0.1");
+        orderQuantityInput.value = "1.0";
+    } else {
+        orderQuantityInput.setAttribute("min", "1");
+        orderQuantityInput.setAttribute("step", "1");
+        orderQuantityInput.value = "1";
+    }
+
     currentlyOpenDrawer = receiverDrawer;
     drawerOverlay.style.display = "block";
-    setTimeout(() => { receiverDrawer.classList.add("open"); }, 10);
+    
+    setTimeout(() => { 
+        receiverDrawer.classList.add("open"); 
+    }, 10);
+
+    // FIXED TIMEOUT: Waits 450ms for the sliding transition to completely end
+    // before recalculating layout bounds and requesting map assets.
+    setTimeout(() => {
+        if (deliveryMap) {
+            deliveryMap.invalidateSize();
+        }
+    }, 450);
 }
 
 function openDonorDrawer() {
