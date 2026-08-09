@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UMMA | Owner Admin Portal (Firebase)</title>
+    <title>UMMA | Owner Admin Portal</title>
     <link rel="icon" type="image/png" href="Logo.png">
+
+    <!-- Firebase App (Core) SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <!-- Firebase Realtime Database SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
     <style>
         * {
@@ -17,6 +22,7 @@
             padding: 0;
             color: #1A365D;
         }
+
         header {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -29,73 +35,265 @@
             top: 0;
             z-index: 100;
         }
-        .logo-container { display: flex; align-items: center; gap: 12px; }
-        .logo-graphic { width: 44px; height: 44px; object-fit: contain; }
-        .logo { font-size: 28px; font-weight: 900; color: #112A61; display: flex; align-items: center; gap: 10px; }
-        .logo .korean-divider { color: #CBD5E1; font-weight: 300; font-size: 24px; }
-        .logo .korean-text { font-family: "Malgun Gothic", sans-serif; font-size: 23px; font-weight: 800; color: #E25C80; }
-        .admin-badge { background: #112A61; color: #38BDF8; font-size: 12px; font-weight: 800; padding: 6px 14px; border-radius: 20px; }
+        .logo-container { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+        }
+        .logo-graphic {
+            width: 44px;
+            height: 44px;
+            object-fit: contain;
+        }
+        .logo { 
+            font-size: 28px; 
+            font-weight: 900; 
+            color: #112A61; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            letter-spacing: -0.5px;
+        }
+        .logo .korean-divider {
+            color: #CBD5E1;
+            font-weight: 300;
+            font-size: 24px;
+        }
+        .logo .korean-text { 
+            font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+            font-size: 23px; 
+            font-weight: 800; 
+            color: #E25C80; 
+        }
+        .admin-badge {
+            background: #112A61;
+            color: #38BDF8;
+            font-size: 12px;
+            font-weight: 800;
+            padding: 6px 14px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+        }
 
-        .main-container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
-        .admin-panel-card { background: #FFFFFF; border-radius: 24px; border: 2px solid #EAEFF5; padding: 32px; box-shadow: 0 12px 36px rgba(17, 42, 97, 0.08); }
+        .main-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
 
-        .tab-menu { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid #EAEFF5; padding-bottom: 12px; }
-        .tab-btn { background: #EDF5FF; color: #112A61; border: 2px solid #BCE3FF; padding: 10px 20px; font-weight: 800; border-radius: 12px; cursor: pointer; }
-        .tab-btn.active { background: #112A61; color: #FFFFFF; border-color: #112A61; }
+        .admin-panel-card {
+            background: #FFFFFF;
+            border-radius: 24px;
+            border: 2px solid #EAEFF5;
+            padding: 32px;
+            box-shadow: 0 12px 36px rgba(17, 42, 97, 0.08);
+        }
 
-        .panel-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #F4F8FC; padding-bottom: 15px; margin-bottom: 20px; }
-        .panel-title { margin: 0; font-size: 22px; font-weight: 800; color: #112A61; }
+        /* TAB CONTROLS */
+        .tab-menu {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #EAEFF5;
+            padding-bottom: 12px;
+        }
+        .tab-btn {
+            background: #EDF5FF;
+            color: #112A61;
+            border: 2px solid #BCE3FF;
+            padding: 10px 20px;
+            font-weight: 800;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .tab-btn.active {
+            background: #112A61;
+            color: #FFFFFF;
+            border-color: #112A61;
+        }
 
-        .delete-single-btn { background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; padding: 6px 12px; font-weight: 700; font-size: 13px; border-radius: 8px; cursor: pointer; margin-left: 10px; }
-        .delete-single-btn:hover { background: #EF4444; color: white; }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #F4F8FC;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
 
-        .admin-card { background: #FCFDFE; border: 2px solid #EAEFF5; border-radius: 16px; padding: 20px; margin-bottom: 18px; }
-        .admin-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #EAEFF5; padding-bottom: 12px; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
+        .panel-title {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 800;
+            color: #112A61;
+        }
 
-        .tracking-id { background: #112A61; color: #38BDF8; font-family: monospace; padding: 4px 10px; border-radius: 6px; font-weight: 800; font-size: 15px; }
-        .donor-id { background: #E25C80; color: #FFFFFF; font-family: monospace; padding: 4px 10px; border-radius: 6px; font-weight: 800; font-size: 15px; }
-        .status-select { padding: 6px 12px; border-radius: 8px; border: 2px solid #BCE3FF; font-weight: 700; color: #112A61; background: #FFFFFF; }
-        .info-body { font-size: 14.5px; line-height: 1.6; color: #4A5568; }
-        .empty-state { text-align: center; padding: 50px 20px; color: #64748B; font-weight: 600; }
+        .refresh-btn {
+            background: #EDF5FF;
+            color: #112A61;
+            border: 2px solid #BCE3FF;
+            padding: 8px 16px;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .refresh-btn:hover { background: #D6E8FF; }
+
+        .clear-all-btn {
+            background: #EF4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background 0.2s ease;
+        }
+        .clear-all-btn:hover { background: #DC2626; }
+
+        .delete-single-btn {
+            background: #FEE2E2;
+            color: #991B1B;
+            border: 1px solid #FCA5A5;
+            padding: 6px 12px;
+            font-weight: 700;
+            font-size: 13px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: 10px;
+        }
+        .delete-single-btn:hover {
+            background: #EF4444;
+            color: white;
+            border-color: #EF4444;
+        }
+
+        .admin-card {
+            background: #FCFDFE;
+            border: 2px solid #EAEFF5;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 18px;
+            transition: all 0.2s ease;
+        }
+        .admin-card:hover { border-color: #CBD5E1; }
+
+        .admin-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #EAEFF5;
+            padding-bottom: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tracking-id {
+            background: #112A61;
+            color: #38BDF8;
+            font-family: monospace;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 800;
+            font-size: 15px;
+        }
+        .donor-id {
+            background: #E25C80;
+            color: #FFFFFF;
+            font-family: monospace;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 800;
+            font-size: 15px;
+        }
+
+        .status-select {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 2px solid #BCE3FF;
+            font-weight: 700;
+            color: #112A61;
+            background: #FFFFFF;
+            cursor: pointer;
+        }
+
+        .pickup-date-input {
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 2px solid #BCE3FF;
+            font-weight: 600;
+            color: #112A61;
+            background: #FFFFFF;
+            font-size: 13px;
+        }
+
+        .info-body {
+            font-size: 14.5px;
+            line-height: 1.6;
+            color: #4A5568;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #64748B;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
 
 <header>
     <div class="logo-container">
-        <img src="Logo.png" alt="UMMA Logo" class="logo-graphic" onerror="this.style.display='none'">
+        <img src="Logo.png" alt="UMMA Logo" class="logo-graphic">
         <div class="logo">
-            UMMA <div class="korean-divider">|</div> <div class="korean-text">엄마</div>
+            UMMA 
+            <div class="korean-divider">|</div> 
+            <div class="korean-text">엄마</div>
         </div>
     </div>
-    <div class="admin-badge">FIREBASE ADMIN PORTAL</div>
+    <div class="admin-badge">OWNER ADMIN PORTAL</div>
 </header>
 
 <div class="main-container">
     <div class="admin-panel-card">
         
+        <!-- TABS FOR NAVIGATION -->
         <div class="tab-menu">
             <button class="tab-btn active" id="tabOrdersBtn" onclick="switchTab('orders')">📦 Customer Orders</button>
             <button class="tab-btn" id="tabDonorsBtn" onclick="switchTab('donors')">🥛 Milk Donors</button>
         </div>
 
-        <!-- ORDERS SECTION -->
+        <!-- SECTION 1: CUSTOMER ORDERS -->
         <div id="ordersSection">
             <div class="panel-header">
                 <div>
-                    <h2 class="panel-title">Customer Live Orders (Firebase)</h2>
-                    <span style="font-size: 13px; color: #64748B;">Real-time sync direct from Firebase database.</span>
+                    <h2 class="panel-title">Customer Live Orders</h2>
+                    <span style="font-size: 13px; color: #64748B;">Update delivery status or delete single completed/invalid orders.</span>
+                </div>
+                <div>
+                    <button class="refresh-btn" onclick="renderOrders()">↻ Refresh</button>
+                    <button class="clear-all-btn" onclick="clearAllOrders()">Delete All Orders</button>
                 </div>
             </div>
             <div id="adminOrdersContainer"></div>
         </div>
 
-        <!-- DONORS SECTION -->
+        <!-- SECTION 2: MILK DONORS -->
         <div id="donorsSection" style="display: none;">
             <div class="panel-header">
                 <div>
-                    <h2 class="panel-title">Milk Donor Applications (Firebase)</h2>
-                    <span style="font-size: 13px; color: #64748B;">Real-time donor collection records.</span>
+                    <h2 class="panel-title">Milk Donor Applications</h2>
+                    <span style="font-size: 13px; color: #64748B;">View registered donors, schedule collection, or update fulfillment status.</span>
+                </div>
+                <div>
+                    <button class="refresh-btn" onclick="renderDonors()">↻ Refresh</button>
+                    <button class="clear-all-btn" onclick="clearAllDonors()">Delete All Donors</button>
                 </div>
             </div>
             <div id="adminDonorsContainer"></div>
@@ -104,136 +302,184 @@
     </div>
 </div>
 
-<!-- FIREBASE SDK SCRIPTS -->
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
+<script>
+    // Initialize Firebase with your configured credentials
     const firebaseConfig = {
-        apiKey: "IMONG_API_KEY",
+        apiKey: "AIzaSyDFcVKUXi7S0KbIwLAtHd9icy5O2SxIcu4",
         authDomain: "umma-milk-system-7bb00.firebaseapp.com",
         databaseURL: "https://umma-milk-system-7bb00-default-rtdb.asia-southeast1.firebasedatabase.app",
         projectId: "umma-milk-system-7bb00",
         storageBucket: "umma-milk-system-7bb00.appspot.com",
-        messagingSenderId: "IMONG_SENDER_ID",
-        appId: "IMONG_APP_ID"
+        messagingSenderId: "223191939316",
+        appId: "1:223191939316:web:20b44a7998019c557006a1"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
     let currentTab = 'orders';
 
-    window.switchTab = function(tab) {
+    function switchTab(tab) {
         currentTab = tab;
         if (tab === 'orders') {
             document.getElementById('ordersSection').style.display = 'block';
             document.getElementById('donorsSection').style.display = 'none';
             document.getElementById('tabOrdersBtn').classList.add('active');
             document.getElementById('tabDonorsBtn').classList.remove('active');
+            renderOrders();
         } else {
             document.getElementById('ordersSection').style.display = 'none';
             document.getElementById('donorsSection').style.display = 'block';
             document.getElementById('tabOrdersBtn').classList.remove('active');
             document.getElementById('tabDonorsBtn').classList.add('active');
+            renderDonors();
         }
     }
 
-    // REAL-TIME ORDERS LISTENER
-    const ordersRef = ref(db, 'umma_orders');
-    onValue(ordersRef, (snapshot) => {
+    /* CUSTOMER ORDERS LOGIC (FIREBASE) */
+    function renderOrders() {
         const container = document.getElementById('adminOrdersContainer');
-        const data = snapshot.val();
+        
+        db.ref('umma_orders').on('value', (snapshot) => {
+            const data = snapshot.val();
+            const orders = data ? Object.keys(data).map(key => ({ firebaseKey: key, ...data[key] })) : [];
 
-        if (!data) {
-            container.innerHTML = `<div class="empty-state"><h3>No Customer Orders Found in Firebase</h3><p>Orders submitted from your form will appear here instantly.</p></div>`;
-            return;
+            if (orders.length === 0) {
+                container.innerHTML = `<div class="empty-state"><h3>No Customer Orders Found</h3><p>When customers place orders, they will automatically appear here.</p></div>`;
+                return;
+            }
+
+            container.innerHTML = orders.map(order => `
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <div>
+                            <span class="tracking-id">${order.id}</span>
+                            <span style="font-size: 12px; color: #64748B; margin-left: 10px;">Placed: ${order.date}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
+                            <label style="font-size: 13px; font-weight: 700; color: #112A61;">Status:</label>
+                            <select class="status-select" onchange="updateOrderStatus('${order.firebaseKey}', this.value)">
+                                <option value="Order Received" ${order.status === 'Order Received' ? 'selected' : ''}>Order Received</option>
+                                <option value="Preparing" ${order.status === 'Preparing' ? 'selected' : ''}>Preparing</option>
+                                <option value="In Transit" ${order.status === 'In Transit' ? 'selected' : ''}>In Transit</option>
+                                <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                            </select>
+                            <button class="delete-single-btn" onclick="deleteSingleOrder('${order.firebaseKey}', '${order.id}')">✕ Delete Order</button>
+                        </div>
+                    </div>
+                    <div class="info-body">
+                        <p style="margin: 4px 0;"><strong>Customer Name:</strong> ${order.customerName} | <strong>Phone:</strong> ${order.phone}</p>
+                        <p style="margin: 4px 0;"><strong>Product Ordered:</strong> ${order.productName} (${order.quantity})</p>
+                        <p style="margin: 4px 0;"><strong>Supplier Hub:</strong> ${order.hub}</p>
+                        <p style="margin: 4px 0; color: #112A61;"><strong>Delivery Target Address:</strong> ${order.address}</p>
+                    </div>
+                </div>
+            `).join('');
+        });
+    }
+
+    function updateOrderStatus(firebaseKey, newStatus) {
+        db.ref(`umma_orders/${firebaseKey}`).update({ status: newStatus });
+    }
+
+    function deleteSingleOrder(firebaseKey, displayId) {
+        if (confirm(`Are you sure you want to delete Order ID: ${displayId}?`)) {
+            db.ref(`umma_orders/${firebaseKey}`).remove();
         }
+    }
 
-        container.innerHTML = Object.entries(data).map(([firebaseKey, order]) => `
-            <div class="admin-card">
-                <div class="admin-card-header">
-                    <div>
-                        <span class="tracking-id">${order.id || 'N/A'}</span>
-                        <span style="font-size: 12px; color: #64748B; margin-left: 10px;">Placed: ${order.date || 'N/A'}</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <label style="font-size: 13px; font-weight: 700; color: #112A61;">Status:</label>
-                        <select class="status-select" onchange="updateOrderStatus('${firebaseKey}', this.value)">
-                            <option value="Order Received" ${order.status === 'Order Received' ? 'selected' : ''}>Order Received</option>
-                            <option value="Preparing" ${order.status === 'Preparing' ? 'selected' : ''}>Preparing</option>
-                            <option value="In Transit" ${order.status === 'In Transit' ? 'selected' : ''}>In Transit</option>
-                            <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
-                        </select>
-                        <button class="delete-single-btn" onclick="deleteOrder('${firebaseKey}')">✕ Delete</button>
-                    </div>
-                </div>
-                <div class="info-body">
-                    <p style="margin: 4px 0;"><strong>Customer:</strong> ${order.customerName || 'N/A'} | <strong>Phone:</strong> ${order.phone || 'N/A'}</p>
-                    <p style="margin: 4px 0;"><strong>Product:</strong> ${order.productName || 'N/A'} (${order.quantity || 'N/A'})</p>
-                    <p style="margin: 4px 0;"><strong>Hub:</strong> ${order.hub || 'N/A'}</p>
-                    <p style="margin: 4px 0; color: #112A61;"><strong>Address:</strong> ${order.address || 'N/A'}</p>
-                </div>
-            </div>
-        `).join('');
-    });
+    function clearAllOrders() {
+        if (confirm("WARNING: Are you sure you want to delete ALL Customer Orders?")) {
+            db.ref('umma_orders').remove();
+        }
+    }
 
-    // REAL-TIME DONORS LISTENER
-    const donorsRef = ref(db, 'umma_donors');
-    onValue(donorsRef, (snapshot) => {
+    /* MILK DONORS LOGIC (FIREBASE) */
+    function renderDonors() {
         const container = document.getElementById('adminDonorsContainer');
-        const data = snapshot.val();
 
-        if (!data) {
-            container.innerHTML = `<div class="empty-state"><h3>No Donor Applications Found in Firebase</h3><p>Donor forms submitted will show up here instantly.</p></div>`;
-            return;
+        db.ref('umma_donors').on('value', (snapshot) => {
+            const data = snapshot.val();
+            const donors = data ? Object.keys(data).map(key => ({ firebaseKey: key, ...data[key] })) : [];
+
+            if (donors.length === 0) {
+                container.innerHTML = `<div class="empty-state"><h3>No Donor Applications Found</h3><p>When mothers apply via "Be a Milk Donor", their details will show up here.</p></div>`;
+                return;
+            }
+
+            container.innerHTML = donors.map(donor => {
+                const isScheduled = donor.status && donor.status.startsWith('Scheduled');
+                const baseStatus = isScheduled ? 'Scheduled Pickup' : (donor.status || 'Pending Collection');
+                
+                return `
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <div>
+                                <span class="donor-id">${donor.id}</span>
+                                <span style="font-size: 12px; color: #64748B; margin-left: 10px;">Applied: ${donor.date}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
+                                <label style="font-size: 13px; font-weight: 700; color: #112A61;">Donor Status:</label>
+                                <select class="status-select" onchange="updateDonorStatus('${donor.firebaseKey}', this.value, this)">
+                                    <option value="Pending Collection" ${baseStatus === 'Pending Collection' ? 'selected' : ''}>Pending Collection</option>
+                                    <option value="Scheduled Pickup" ${baseStatus === 'Scheduled Pickup' ? 'selected' : ''}>Scheduled Pickup</option>
+                                    <option value="Collected" ${baseStatus === 'Collected' ? 'selected' : ''}>Collected</option>
+                                </select>
+                                
+                                <input type="datetime-local" class="pickup-date-input" value="${donor.pickupDate || ''}" style="display: ${baseStatus === 'Scheduled Pickup' ? 'inline-block' : 'none'};" onchange="updatePickupDate('${donor.firebaseKey}', this.value)">
+
+                                <button class="delete-single-btn" onclick="deleteSingleDonor('${donor.firebaseKey}', '${donor.id}')">✕ Delete Donor</button>
+                            </div>
+                        </div>
+                        <div class="info-body">
+                            <p style="margin: 4px 0;"><strong>Donor Name:</strong> ${donor.name} | <strong>Phone:</strong> ${donor.phone}</p>
+                            <p style="margin: 4px 0;"><strong>Estimated Volume:</strong> ${donor.volume} | <strong>Expression Date:</strong> ${donor.exprDate}</p>
+                            <p style="margin: 4px 0; color: #112A61;"><strong>Pickup Address:</strong> ${donor.address}</p>
+                            ${isScheduled ? `<p style="margin: 4px 0; color: #E25C80; font-weight: 700;">Scheduled Pickup Date & Time: ${donor.pickupDate ? new Date(donor.pickupDate).toLocaleString() : 'Not set'}</p>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        });
+    }
+
+    function updateDonorStatus(firebaseKey, newStatus, selectElement) {
+        const dateInput = selectElement.parentElement.querySelector('.pickup-date-input');
+        let updatePayload = {};
+
+        if (newStatus === 'Scheduled Pickup') {
+            dateInput.style.display = 'inline-block';
+            updatePayload.status = `Scheduled: ${dateInput.value || 'Not set'}`;
+        } else {
+            dateInput.style.display = 'none';
+            updatePayload.status = newStatus;
+            updatePayload.pickupDate = '';
         }
+        db.ref(`umma_donors/${firebaseKey}`).update(updatePayload);
+    }
 
-        container.innerHTML = Object.entries(data).map(([firebaseKey, donor]) => `
-            <div class="admin-card">
-                <div class="admin-card-header">
-                    <div>
-                        <span class="donor-id">${donor.id || 'N/A'}</span>
-                        <span style="font-size: 12px; color: #64748B; margin-left: 10px;">Applied: ${donor.date || 'N/A'}</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <label style="font-size: 13px; font-weight: 700; color: #112A61;">Status:</label>
-                        <select class="status-select" onchange="updateDonorStatus('${firebaseKey}', this.value)">
-                            <option value="Pending Collection" ${donor.status === 'Pending Collection' ? 'selected' : ''}>Pending Collection</option>
-                            <option value="Collected" ${donor.status === 'Collected' ? 'selected' : ''}>Collected</option>
-                        </select>
-                        <button class="delete-single-btn" onclick="deleteDonor('${firebaseKey}')">✕ Delete</button>
-                    </div>
-                </div>
-                <div class="info-body">
-                    <p style="margin: 4px 0;"><strong>Donor Name:</strong> ${donor.name || 'N/A'} | <strong>Phone:</strong> ${donor.phone || 'N/A'}</p>
-                    <p style="margin: 4px 0;"><strong>Volume:</strong> ${donor.volume || 'N/A'} | <strong>Expression Date:</strong> ${donor.exprDate || 'N/A'}</p>
-                    <p style="margin: 4px 0; color: #112A61;"><strong>Pickup Address:</strong> ${donor.address || 'N/A'}</p>
-                </div>
-            </div>
-        `).join('');
+    function updatePickupDate(firebaseKey, dateTimeVal) {
+        db.ref(`umma_donors/${firebaseKey}`).update({
+            pickupDate: dateTimeVal,
+            status: `Scheduled: ${dateTimeVal}`
+        });
+    }
+
+    function deleteSingleDonor(firebaseKey, displayId) {
+        if (confirm(`Are you sure you want to delete Donor Record ID: ${displayId}?`)) {
+            db.ref(`umma_donors/${firebaseKey}`).remove();
+        }
+    }
+
+    function clearAllDonors() {
+        if (confirm("WARNING: Are you sure you want to delete ALL Donor Applications?")) {
+            db.ref('umma_donors').remove();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        renderOrders();
     });
-
-    // Global Database Update/Delete Functions
-    window.updateOrderStatus = function(key, newStatus) {
-        update(ref(db, `umma_orders/${key}`), { status: newStatus });
-    }
-
-    window.deleteOrder = function(key) {
-        if (confirm("Delete this order from Firebase?")) {
-            remove(ref(db, `umma_orders/${key}`));
-        }
-    }
-
-    window.updateDonorStatus = function(key, newStatus) {
-        update(ref(db, `umma_donors/${key}`), { status: newStatus });
-    }
-
-    window.deleteDonor = function(key) {
-        if (confirm("Delete this donor application from Firebase?")) {
-            remove(ref(db, `umma_donors/${key}`));
-        }
-    }
 </script>
 
 </body>
