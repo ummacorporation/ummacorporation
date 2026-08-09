@@ -14,133 +14,915 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
     <style>
-        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background: radial-gradient(circle at 50% 30%, #E6F7FF 0%, #C4ECFF 70%, #B5E6FF 100%) fixed; margin: 0; padding: 0; color: #1A365D; }
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        body {
+            background: radial-gradient(circle at 50% 30%, #E6F7FF 0%, #C4ECFF 70%, #B5E6FF 100%) fixed;
+            margin: 0;
+            padding: 0;
+            color: #1A365D;
+        }
 
-        header { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #BCE3FF; position: sticky; top: 0; z-index: 100; }
-        .logo-container { display: flex; align-items: center; gap: 12px; cursor: pointer; }
-        .logo-graphic { width: 44px; height: 44px; object-fit: contain; flex-shrink: 0; }
-        .logo { font-size: 28px; font-weight: 900; color: #112A61; display: flex; align-items: center; gap: 10px; }
-        .header-actions { display: flex; gap: 12px; align-items: center; }
+        header {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #BCE3FF;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo-container { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            cursor: pointer;
+        }
+        .logo-graphic {
+            width: 44px;
+            height: 44px;
+            object-fit: contain;
+            flex-shrink: 0;
+            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .logo-container:hover .logo-graphic {
+            transform: scale(1.06);
+        }
+        .logo { 
+            font-size: 28px; 
+            font-weight: 900; 
+            color: #112A61; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            letter-spacing: -0.5px;
+        }
         
-        .header-track-btn { background: #EDF5FF; color: #112A61; border: 2px solid #BCE3FF; padding: 10px 18px; font-weight: 700; border-radius: 20px; cursor: pointer; }
-        .header-donor-btn { background: #4A90E2; color: white; border: none; padding: 10px 18px; font-weight: 700; border-radius: 20px; cursor: pointer; }
+        .logo .korean-divider {
+            color: #CBD5E1;
+            font-weight: 300;
+            font-size: 24px;
+            margin: 0 -2px;
+        }
+        .logo .korean-text { 
+            font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+            font-size: 23px; 
+            font-weight: 800; 
+            color: #E25C80; 
+            letter-spacing: -0.5px;
+            text-shadow: 1px 1px 0px rgba(226, 92, 128, 0.1);
+            position: relative;
+        }
+        
+        .logo span.subtitle-badge { 
+            font-size: 13px; 
+            font-weight: 600; 
+            color: #4A90E2; 
+            background: #EDF5FF; 
+            padding: 5px 12px; 
+            border-radius: 20px; 
+            letter-spacing: 0px;
+            margin-left: 4px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .header-track-btn { 
+            background: #EDF5FF; 
+            color: #112A61; 
+            border: 2px solid #BCE3FF; 
+            padding: 10px 18px; 
+            font-weight: 700; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+        }
+        .header-track-btn:hover { 
+            background: #D6E8FF; 
+        }
+        .header-donor-btn { 
+            background: #4A90E2; 
+            color: white; 
+            border: none; 
+            padding: 10px 18px; 
+            font-weight: 700; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+        }
+        .header-donor-btn:hover { 
+            background: #357ABD; 
+            transform: translateY(-1px); 
+        }
+
+        .hero-section { 
+            padding: 40px 40px 60px; 
+            text-align: center; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .hero-logo-frame {
+            max-width: 380px;
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0px 8px 24px rgba(17, 42, 97, 0.12));
+            transition: transform 0.4s ease;
+        }
+        .hero-logo-frame:hover {
+            transform: scale(1.02);
+        }
 
         .main-content { background: #FFFFFF; padding: 60px 40px; }
         .main-content-wrapper { max-width: 1200px; margin: 0 auto; }
-        
-        .category-card { background: #FFFFFF; border-radius: 24px; border: 2px solid #EAEFF5; padding: 28px; cursor: pointer; transition: 0.3s; }
-        .category-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-        
-        .grab-side-drawer { position: fixed; top: 0; right: -520px; width: 520px; height: 100%; background: #fff; z-index: 3000; transition: 0.4s; padding: 24px; overflow-y: auto; box-shadow: -5px 0 15px rgba(0,0,0,0.1); }
+        .section-title { font-size: 26px; font-weight: 800; color: #112A61; }
+        .section-subtitle { font-size: 15px; color: #64748B; margin-bottom: 35px; }
+
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; }
+        .category-card { 
+            background: #FFFFFF; 
+            border-radius: 24px; 
+            border: 2px solid #EAEFF5; 
+            padding: 28px; 
+            cursor: pointer; 
+            position: relative; 
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.4s ease;
+        }
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(17, 42, 97, 0.08);
+            border-color: #D6E4F0;
+        }
+
+        .category-card::before { 
+            content: ''; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 6px; 
+            height: 100%; 
+            border-top-left-radius: 22px; 
+            border-bottom-left-radius: 22px;
+            transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .category-card:hover::before { width: 8px; }
+        .category-card.colostrum::before { background: #F5A623; }
+        .category-card.transitional::before { background: #4A90E2; }
+        .category-card.mature::before { background: #E25C80; }
+
+        .category-name { font-size: 20px; font-weight: 700; color: #112A61; margin: 0 0 10px 0; }
+        .category-desc { font-size: 14.5px; line-height: 1.5; color: #4A5568; margin: 0 0 20px 0; }
+
+        .view-products-text {
+            font-size: 14px;
+            font-weight: 700;
+            color: #4A90E2;
+            display: inline-block;
+            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .category-card:hover .view-products-text { transform: translateX(4px); }
+
+        .section-divider { border: 0; height: 1px; background: #EAEFF5; margin: 50px 0; }
+
+        .directory-layout { display: flex; gap: 30px; align-items: stretch; margin-top: 20px; }
+        .directory-list { flex: 1; display: flex; flex-direction: column; gap: 16px; }
+        .directory-item { 
+            background: #FCFDFE; 
+            border: 2px solid #EAEFF5; 
+            border-radius: 16px; 
+            padding: 20px; 
+            cursor: pointer; 
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .directory-item:hover { border-color: #CBD5E1; background: #FAFBFC; }
+        .directory-item.active { border-color: #4A90E2; background: #F4F9FF; transform: scale(1.01); }
+        .directory-item h4 { margin: 0 0 8px 0; font-size: 17px; color: #112A61; }
+        .directory-item p { margin: 4px 0; font-size: 13.5px; color: #4A5568; }
+        .hub-status-badge { position: absolute; top: 20px; right: 20px; font-size: 11px; padding: 3px 8px; border-radius: 20px; font-weight: 700; }
+        .hub-status-badge.online { background: #E6F4EA; color: #137333; }
+        .hub-stock-indicator { display: inline-block; font-size: 12px; font-weight: 700; color: #2B6CB0; margin-top: 8px; }
+
+        .directory-map-graphic { flex: 1.2; min-width: 450px; display: flex; flex-direction: column; }
+        .map-frame-outer {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 440px;
+            border: 3px solid #0F172A;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 12px 36px rgba(15, 23, 42, 0.15);
+        }
+
+        .custom-leaflet-marker-node { background: transparent !important; border: none !important; }
+        .live-core-pin {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 3px solid #FFFFFF;
+            position: relative;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .pin-central { background: #38BDF8; }
+        .pin-delivery { background: #E25C80; border-color: #FFFFFF; }
+
+        .live-core-pin.is-focused {
+            transform: scale(1.5);
+            box-shadow: 0 0 0 8px rgba(34, 197, 94, 0.4), 0 0 20px rgba(255,255,255,0.8);
+        }
+
+        .pulse-radar-wave {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(56, 189, 248, 0.3);
+            animation: markerRadar 2s infinite ease-out;
+            pointer-events: none;
+        }
+        @keyframes markerRadar {
+            0% { transform: scale(0.4); opacity: 1; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+
+        .map-label-tooltip {
+            background: #0F172A !important;
+            color: #F8FAFC !important;
+            border: 1px solid rgba(255,255,255,0.15) !important;
+            padding: 6px 12px !important;
+            border-radius: 8px !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+        }
+
+        .satellite-hud-badge {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            color: #38BDF8;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .map-caption-overlay {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            right: 16px;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(6px);
+            color: #FFFFFF;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 13.5px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            z-index: 1000;
+        }
+
+        .modal-overlay { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(17, 42, 97, 0.4); 
+            backdrop-filter: blur(6px); 
+            z-index: 2000; 
+            align-items: center; 
+            justify-content: center; 
+            transition: opacity 0.3s ease;
+        }
+        .products-popup { 
+            background: #FFFFFF; 
+            width: 95%; 
+            max-width: 700px; 
+            border-radius: 24px; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden;
+            animation: modalSlideUp 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        @keyframes modalSlideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .popup-header { padding: 22px; background: #F4F8FC; border-bottom: 1px solid #EAEFF5; display: flex; justify-content: space-between; align-items: center; }
+        .popup-title { margin: 0; font-size: 20px; font-weight: 800; color: #112A61; }
+        .popup-body { padding: 26px; max-height: 60vh; overflow-y: auto; }
+        .close-popup, .close-drawer { font-size: 22px; cursor: pointer; color: #8A9AAD; transition: color 0.2s ease; }
+        .close-popup:hover, .close-drawer:hover { color: #E25C80; }
+
+        .shop-product-item { border: 1px solid #EAEFF5; border-radius: 18px; padding: 20px; margin-bottom: 15px; transition: border-color 0.3s ease; }
+        .shop-product-item:hover { border-color: #CBD5E1; }
+        .product-meta-block { display: flex; align-items: flex-start; gap: 20px; width: 100%; }
+        .product-thumbnail-frame { width: 100px; height: 100px; border-radius: 12px; object-fit: cover; flex-shrink: 0; }
+        .shop-info-row { display: flex; justify-content: space-between; align-items: flex-start; flex: 1; width: 100%; }
+        .shop-details { display: flex; flex-direction: column; gap: 6px; }
+        .shop-details h4 { margin: 0; font-size: 18px; color: #112A61; line-height: 1.3; }
+        .shop-details p { margin: 0; font-size: 14px; color: #4A5568; }
+        .source-shop { font-weight: 700; color: #E25C80; }
+        .product-caption-desc { color: #718096 !important; font-size: 14px; margin-top: 4px !important; }
+
+        .rating-container { display: flex; flex-direction: column; align-items: flex-end; min-width: 70px; text-align: right; }
+        .star-badge { font-weight: 700; color: #D48806; font-size: 15px; }
+        .review-count { font-size: 13px; color: #718096; margin-top: 2px; }
+
+        .action-buttons-row { display: flex; justify-content: flex-end; gap: 10px; margin-top: 12px; border-top: 1px dashed #EAEFF5; padding-top: 12px; }
+        .order-btn { background: #E25C80; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; }
+        .order-btn:hover { background: #C94A6D; }
+
+        .grab-side-drawer { 
+            position: fixed; 
+            top: 0; 
+            right: -520px; 
+            width: 520px; 
+            height: 100%; 
+            background: #fff; 
+            z-index: 3000; 
+            transition: right 0.4s cubic-bezier(0.25, 1, 0.5, 1); 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: -6px 0 30px rgba(15, 23, 42, 0.1);
+        }
         .grab-side-drawer.open { right: 0; }
-        .grab-field { margin-bottom: 15px; }
-        .grab-field label { font-weight: 700; display: block; margin-bottom: 5px; }
-        .grab-field input, .grab-field select, .grab-field textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
-        .grab-submit-btn { width: 100%; padding: 15px; background: #E25C80; color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .drawer-header { padding: 22px; border-bottom: 1px solid #EAEFF5; display: flex; justify-content: space-between; align-items: center; }
+        .drawer-title { margin: 0; font-size: 22px; font-weight: 800; color: #112A61; }
+        .drawer-body { padding: 24px; overflow-y: auto; flex: 1; }
+        .grab-field { margin-bottom: 16px; }
+        .grab-field label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 6px; color: #112A61; }
+        .grab-field input, .grab-field textarea, .grab-field select { width: 100%; padding: 11px; border: 2px solid #EAEFF5; border-radius: 8px; font-size: 14px; transition: border-color 0.2s ease; background-color: #fff; }
+        .grab-field input:focus, .grab-field textarea:focus, .grab-field select:focus { border-color: #4A90E2; outline: none; }
+        
+        .form-map-container { width: 100%; height: 220px; min-height: 220px; border-radius: 12px; border: 3px solid #0F172A; margin-top: 6px; overflow: hidden; position: relative; }
+        .map-hint-text { font-size: 12px; color: #64748B; margin-top: 4px; font-style: italic; }
+
+        .drawer-footer { padding: 20px 24px; border-top: 1px solid #EAEFF5; background: #FCFDFE; }
+        .grab-submit-btn { width: 100%; padding: 15px; background: #E25C80; color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 15px; transition: all 0.2s ease; }
+        .grab-submit-btn:hover { background: #C94A6D; }
+        .drawer-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(3px); z-index: 2500; transition: opacity 0.3s ease; }
+
+        .order-receipt-box {
+            background: #F8FAFC;
+            border: 2px dashed #4A90E2;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+        .tracking-id-badge {
+            background: #112A61;
+            color: #38BDF8;
+            font-family: monospace;
+            font-size: 18px;
+            padding: 8px 14px;
+            border-radius: 8px;
+            display: inline-block;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin: 10px 0;
+        }
+        .status-pill {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 800;
+            display: inline-block;
+        }
+        .status-received { background: #FEF3C7; color: #92400E; }
+        .status-preparing { background: #E0F2FE; color: #0369A1; }
+        .status-transit { background: #E0E7FF; color: #3730A3; }
+        .status-delivered { background: #DCFCE7; color: #166534; }
+
+        @media(max-width: 768px) {
+            header { padding: 16px 20px; flex-direction: column; gap: 15px; }
+            .header-actions { width: 100%; justify-content: center; flex-wrap: wrap; }
+            .logo { font-size: 24px; }
+            .logo .korean-divider { font-size: 20px; }
+            .logo .korean-text { font-size: 19px; }
+            .logo span.subtitle-badge { display: none; }
+            .directory-layout { flex-direction: column; }
+            .directory-map-graphic { min-width: 100%; }
+            .map-frame-outer { min-height: 320px; }
+            .form-map-container { height: 220px; min-height: 220px; }
+            .product-meta-block { flex-direction: column; align-items: center; text-align: center; }
+            .shop-info-row { flex-direction: column; align-items: center; gap: 10px; }
+            .rating-container { align-items: center; text-align: center; }
+            .grab-side-drawer { width: 100%; right: -100%; }
+            .hero-logo-frame { max-width: 280px; }
+        }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo-container" onclick="location.reload()">
-        <img src="Logo.png" alt="Logo" class="logo-graphic">
-        <div class="logo">UMMA</div>
+    <div class="logo-container" onclick="resetToGlobalView()">
+        <img src="Logo.png" alt="UMMA Header Logo" class="logo-graphic">
+        <div class="logo">
+            UMMA 
+            <div class="korean-divider">|</div> 
+            <div class="korean-text">엄마</div>
+            <span class="subtitle-badge">United Mothers for Milk Association</span>
+        </div>
     </div>
     <div class="header-actions">
         <button class="header-track-btn" onclick="openTrackModal()">Track Order</button>
-        <button class="header-donor-btn" onclick="openDonorDrawer()">Become a Donor</button>
+        <button class="header-donor-btn" onclick="openDonorDrawer()">Be a Milk Donor</button>
     </div>
 </header>
 
+<section class="hero-section">
+    <img src="Logo.png" alt="UMMA 엄마 Logo" class="hero-logo-frame">
+</section>
+
 <main class="main-content">
     <div class="main-content-wrapper">
-        <h1>Available Milk Products</h1>
-        <div class="cards-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-            <div class="category-card" onclick="showProducts('colostrum')">
-                <h3>Colostrum Care Packs</h3>
-                <p>Nutrient-rich early milk for newborns.</p>
+        <div class="section-title">Explore Milk Products</div>
+        <div class="section-subtitle">Click a card to see available products, verified suppliers, ratings, and order parameters.</div>
+        
+        <div class="cards-grid">
+            <div class="category-card colostrum" onclick="showProducts('colostrum')">
+                <h3 class="category-name">Colostrum Care Packs</h3>
+                <p class="category-desc">Early-stage fluid packed with ultra-high antibody levels and immunoglobulins. Essential for premature or newborn infant recovery.</p>
+                <span class="view-products-text" style="color:#D48806;">View Products & Shops →</span>
             </div>
-            <div class="category-card" onclick="showProducts('transitional')">
-                <h3>Transitional Milk</h3>
-                <p>Bridge nutrition for growing infants.</p>
+
+            <div class="category-card transitional" onclick="showProducts('transitional')">
+                <h3 class="category-name">Transitional Milk</h3>
+                <p class="category-desc">Sourced from days 5–14 postpartum. A dynamic nutritional bridge featuring surging levels of healthy fats, calories, and lactose.</p>
+                <span class="view-products-text" style="color:#4A90E2;">View Products & Shops →</span>
             </div>
-            <div class="category-card" onclick="showProducts('mature')">
-                <h3>Mature Milk</h3>
-                <p>Balanced nutrition for sustained growth.</p>
+
+            <div class="category-card mature" onclick="showProducts('mature')">
+                <h3 class="category-name">Mature Milk Batches</h3>
+                <p class="category-desc">Stabilized long-term support breast milk collected past day 15. Formulated perfectly for sustained growth, volume, and hydration.</p>
+                <span class="view-products-text" style="color:#E25C80;">View Products & Shops →</span>
             </div>
         </div>
+
+        <hr class="section-divider">
+
+        <section class="directory-section">
+            <div class="section-title">Verified Hub & Supply Directory</div>
+            <div class="section-subtitle">Official partner center location and live supply details.</div>
+            
+            <div class="directory-layout">
+                <div class="directory-list">
+                    <div class="directory-item active" onclick="focusLiveHub(this, 'central')">
+                        <div class="hub-status-badge online">Active</div>
+                        <h4>UMMA Central Hub Clinic</h4>
+                        <p class="hub-address">Building B, Healthcare Prime District</p>
+                        <p class="hub-hours">Mon - Sat: 8:00 AM - 5:00 PM</p>
+                        <span class="hub-stock-indicator">High Storage Supply (Colostrum, Transitional & Mature)</span>
+                    </div>
+                </div>
+
+                <div class="directory-map-graphic">
+                    <div class="map-frame-outer">
+                        <div id="liveSatelliteMap" style="width: 100%; height: 100%;"></div>
+                        <div class="satellite-hud-badge">LIVE EARTH SATELLITE</div>
+                        <div class="map-caption-overlay">Currently Displaying: <strong id="hudLocationText">UMMA Central Hub Clinic</strong></div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 </main>
 
-<!-- Modals and Drawers (Simplified for English) -->
-<div id="productsModal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
-    <div class="products-popup" style="background:#fff; padding:20px; border-radius:15px; width:500px;">
-        <h3>Select Product</h3>
-        <div id="modalProductList"></div>
-        <button onclick="closePopup()">Close</button>
+<div class="modal-overlay" id="productsModal">
+    <div class="products-popup">
+        <div class="popup-header">
+            <h3 class="popup-title" id="modalTitle">Available Products</h3>
+            <span class="close-popup" onclick="closePopup()">&times;</span>
+        </div>
+        <div class="popup-body" id="modalProductList"></div>
     </div>
 </div>
 
-<div class="grab-side-drawer" id="receiverDrawer">
-    <h2>Request Order</h2>
-    <form id="ummaReceiverForm" onsubmit="submitOrder(event)">
-        <div class="grab-field"><label>Full Name</label><input type="text" id="orderCustName" required></div>
-        <div class="grab-field"><label>Phone Number</label><input type="tel" id="orderCustPhone" required></div>
-        <div class="grab-field"><label>Priority Level</label>
-            <select id="patientPriority">
-                <option value="Emergency">Emergency</option>
-                <option value="Normal">Normal</option>
-            </select>
+<div class="modal-overlay" id="receiptModal">
+    <div class="products-popup">
+        <div class="popup-header">
+            <h3 class="popup-title">Order Confirmed</h3>
+            <span class="close-popup" onclick="closeReceiptModal()">&times;</span>
         </div>
-        <div class="grab-field"><label>Delivery Address</label><textarea id="deliveryAddressText" required></textarea></div>
-        <button type="submit" class="grab-submit-btn">Submit Order</button>
-    </form>
-    <button onclick="dismissActiveDrawer()" style="margin-top:10px;">Cancel</button>
+        <div class="popup-body">
+            <p style="margin: 0; color: #166534; font-weight: 700;">Your request has been recorded in our system.</p>
+            <div class="order-receipt-box">
+                <div style="font-size: 13px; color: #64748B; font-weight: 700;">YOUR TRACKING NUMBER / ORDER ID:</div>
+                <div class="tracking-id-badge" id="receiptTrackingId">UMMA-000000</div>
+                <p style="font-size: 13px; color: #4A5568;">Keep this tracking number to monitor your delivery status live on our site.</p>
+                <hr style="border: 0; height: 1px; background: #CBD5E1; margin: 15px 0;">
+                <h4 style="margin: 0 0 8px 0; color: #112A61;">Order Summary</h4>
+                <p id="receiptItemName" style="margin: 4px 0; font-weight: 700; color: #112A61;"></p>
+                <p id="receiptCustomerName" style="margin: 4px 0; font-size: 14px; color: #4A5568;"></p>
+                <p id="receiptAddress" style="margin: 4px 0; font-size: 14px; color: #4A5568;"></p>
+            </div>
+            <div style="margin-top: 20px; text-align: right;">
+                <button class="order-btn" onclick="closeReceiptModal()">Close Receipt</button>
+            </div>
+        </div>
+    </div>
 </div>
 
+<div class="modal-overlay" id="trackModal">
+    <div class="products-popup">
+        <div class="popup-header">
+            <h3 class="popup-title">Track Order or Donor Application</h3>
+            <span class="close-popup" onclick="closeTrackModal()">&times;</span>
+        </div>
+        <div class="popup-body">
+            <div class="grab-field">
+                <label>Enter Tracking Number / Order ID / Donor ID</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="trackInput" placeholder="e.g., UMMA-849201 or DNR-..." style="text-transform: uppercase;">
+                    <button class="order-btn" onclick="performTracking()" style="padding: 0 20px; flex-shrink: 0;">Search</button>
+                </div>
+            </div>
+            <div id="trackingResultContainer" style="margin-top: 20px;"></div>
+        </div>
+    </div>
+</div>
+
+<div class="drawer-overlay" id="drawerOverlay" onclick="dismissActiveDrawer()"></div>
+
+<div class="grab-side-drawer" id="receiverDrawer">
+    <div class="drawer-header"><h2 class="drawer-title">UMMA Order Request</h2><span class="close-drawer" onclick="dismissActiveDrawer()">&times;</span></div>
+    <div class="drawer-body">
+        <form id="ummaReceiverForm" onsubmit="submitOrder(event)">
+            <div class="grab-field"><label>Full Name</label><input type="text" id="orderCustName" placeholder="Enter full name" required></div>
+            <div class="grab-field"><label>Phone Number</label><input type="tel" id="orderCustPhone" placeholder="09XXXXXXXXX" required></div>
+            
+            <div class="grab-field">
+                <label>Patient Priority Level</label>
+                <select id="patientPriority" required>
+                    <option value="" disabled selected>-- Select Priority Level --</option>
+                    <option value="Emergency NICU / Premature">Emergency NICU / Premature (Urgent)</option>
+                    <option value="Normal Newborn Care">Normal Newborn Care</option>
+                    <option value="Medical Supplement">Medical Supplement</option>
+                </select>
+            </div>
+
+            <div class="grab-field">
+                <label>Home Delivery Address & Pin</label>
+                <textarea id="deliveryAddressText" rows="2" placeholder="Enter address or tap the map below to pinpoint exact delivery coordinates" required></textarea>
+                <div class="form-map-container" id="deliveryFormMap"></div>
+                <div class="map-hint-text">Tap or drag anywhere on the map above to accurately pin your location.</div>
+            </div>
+            
+            <div class="grab-field">
+                <label id="quantityFieldLabel">Milk Quantity Needed</label>
+                <input type="number" id="orderQuantityInput" min="1" step="1" value="1" required>
+            </div>
+            
+            <div class="grab-field"><label>Selected Product</label><textarea id="checkoutProductDetails" rows="3" readonly style="background-color: #F4F8FC; border-color: #EAEFF5; cursor: not-allowed;"></textarea></div>
+        </form>
+    </div>
+    <div class="drawer-footer"><button type="submit" form="ummaReceiverForm" class="grab-submit-btn">Confirm Order Request</button></div>
+</div>
+
+<div class="grab-side-drawer" id="donorDrawer">
+    <div class="drawer-header"><h2 class="drawer-title">Donor Registration Form</h2><span class="close-drawer" onclick="dismissActiveDrawer()">&times;</span></div>
+    <div class="drawer-body">
+        <form id="ummaDonorForm" onsubmit="submitDonor(event)">
+            <div class="grab-field"><label>Full Name</label><input type="text" id="donorName" placeholder="Enter full name" required></div>
+            <div class="grab-field"><label>Contact Number</label><input type="tel" id="donorPhone" placeholder="09XXXXXXXXX" required></div>
+            <div class="grab-field"><label>Pick-up Address</label><textarea id="donorAddress" rows="2" placeholder="Enter collection address" required></textarea></div>
+            <div class="grab-field"><label>Approximate Volume (Liters)</label><input type="number" id="donorVolume" min="0.1" step="0.1" placeholder="e.g. 1.5" required></div>
+            <div class="grab-field"><label>Expression Date</label><input type="date" id="donorDate" required></div>
+        </form>
+    </div>
+    <div class="drawer-footer"><button type="submit" form="ummaDonorForm" class="grab-submit-btn">Submit Donor Application</button></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
+// Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyDFcVKUXi7S0KbIwLAHd9icy502SxIcu4",
+    authDomain: "umma-milk-system-7bb00.firebaseapp.com",
     projectId: "umma-milk-system-7bb00",
-    // ... rest of your config
+    storageBucket: "umma-milk-system-7bb00.firebasestorage.app",
+    messagingSenderId: "223191939316",
+    appId: "1:223191939316:web:20b44a7998019c557006a1",
+    measurementId: "G-KXQ57FXQ9E"
 };
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// Functions for ordering and tracking in English
-async function submitOrder(e) {
-    e.preventDefault();
-    const orderId = 'UMMA-' + Math.floor(100000 + Math.random() * 900000);
-    const orderData = {
-        id: orderId,
-        customerName: document.getElementById('orderCustName').value,
-        status: 'Order Received',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
+const productDatabase = {
+    colostrum: [
+        { name: "Premium Newborn Colostrum Kit", shop: "UMMA Central Hub Clinic", rating: 5.0, reviews: 42, image: "https://images.squarespace-cdn.com/content/v1/5c65a4e0b91449610be76a7f/1613167703016-BXM6O2VWRUOO3CVLNC9O/brick+storage.png", description: "Concentrated early-stage liquid amber fluid containing high concentrations of targeted maternal antibodies.", unit: "Syringes" }
+    ],
+    transitional: [
+        { name: "Bridge Nutrient Transitional Pack (300ml)", shop: "UMMA Central Hub Clinic", rating: 4.8, reviews: 89, image: "https://images.squarespace-cdn.com/content/v1/5c65a4e0b91449610be76a7f/1613167703016-BXM6O2VWRUOO3CVLNC9O/brick+storage.png", description: "Mid-stage transitional breast milk high in raw fat content and caloric density.", unit: "Pouches" }
+    ],
+    mature: [
+        { name: "Sustained-Growth Mature Milk Bag", shop: "UMMA Central Hub Clinic", rating: 4.9, reviews: 156, image: "https://images.squarespace-cdn.com/content/v1/5c65a4e0b91449610be76a7f/1613167703016-BXM6O2VWRUOO3CVLNC9O/brick+storage.png", description: "Completely screened, balanced long-term mature formulation for healthy infants over two weeks old.", unit: "Liters" }
+    ]
+};
+
+const locations = {
+    central: { coords: [14.5547, 121.0244], name: "UMMA Central Hub Clinic", zoom: 17 }
+};
+
+let map, deliveryMap;
+let mapMarkers = {};
+let deliveryMarker = null;
+let currentSelectedProductInfo = { name: '', shop: '', unit: '' };
+
+document.addEventListener("DOMContentLoaded", () => {
+    map = L.map('liveSatelliteMap', { zoomControl: false, attributionControl: false }).setView([14.5547, 121.0244], 17);
+
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 }).addTo(map);
+
+    Object.keys(locations).forEach(key => {
+        const data = locations[key];
+        const customIcon = L.divIcon({
+            className: 'custom-leaflet-marker-node',
+            html: `<div class="live-core-pin pin-${key} is-focused"><div class="pulse-radar-wave"></div></div>`,
+            iconSize: [20, 20],
+            iconAnchor: [10, 10]
+        });
+
+        const marker = L.marker(data.coords, { icon: customIcon }).addTo(map);
+        marker.bindTooltip(`<strong>${data.name}</strong>`, { direction: 'top', className: 'map-label-tooltip' });
+        mapMarkers[key] = marker;
+    });
+
+    initDeliveryFormMap();
     
-    try {
-        await db.collection("orders").doc(orderId).set(orderData);
-        alert("Order submitted successfully! Your ID is: " + orderId);
-        dismissActiveDrawer();
-    } catch (err) {
-        alert("Error: " + err.message);
+    window.addEventListener('resize', () => {
+        if (map) map.invalidateSize();
+        if (deliveryMap) deliveryMap.invalidateSize();
+    });
+});
+
+function initDeliveryFormMap() {
+    deliveryMap = L.map('deliveryFormMap', { zoomControl: true, attributionControl: false }).setView([14.5600, 121.0300], 13);
+
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 }).addTo(deliveryMap);
+
+    const deliveryIcon = L.divIcon({
+        className: 'custom-leaflet-marker-node',
+        html: `<div class="live-core-pin pin-delivery"><div class="pulse-radar-wave" style="background:rgba(226,92,128,0.4)"></div></div>`,
+        iconSize: [20, 20],
+        iconAnchor: [10, 10]
+    });
+
+    deliveryMap.on('click', (e) => {
+        const { lat, lng } = e.latlng;
+        updateDeliveryCoordinates(lat, lng, deliveryIcon);
+    });
+}
+
+function updateDeliveryCoordinates(lat, lng, icon) {
+    const coordString = `Pinpoint Coordinates: [Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}]`;
+    document.getElementById('deliveryAddressText').value = coordString;
+
+    if (!deliveryMarker) {
+        deliveryMarker = L.marker([lat, lng], { icon: icon, draggable: true }).addTo(deliveryMap);
+        deliveryMarker.on('dragend', () => {
+            const position = deliveryMarker.getLatLng();
+            updateDeliveryCoordinates(position.lat, position.lng, icon);
+        });
+    } else {
+        deliveryMarker.setLatLng([lat, lng]);
     }
 }
 
-function openOrderDrawer(name) {
+function focusLiveHub(element, key) {
+    document.querySelectorAll('.directory-item').forEach(item => item.classList.remove('active'));
+    element.classList.add('active');
+
+    const target = locations[key];
+    if (target && map) {
+        map.flyTo(target.coords, target.zoom, { animate: true, duration: 1.5 });
+        document.getElementById('hudLocationText').innerText = target.name;
+    }
+}
+
+function resetToGlobalView() {
+    if (map) {
+        map.flyTo([14.5547, 121.0244], 17, { animate: true, duration: 1.5 });
+        document.getElementById('hudLocationText').innerText = "UMMA Central Hub Clinic";
+    }
+}
+
+function showProducts(category) {
+    const listContainer = document.getElementById('modalProductList');
+    const modalTitle = document.getElementById('modalTitle');
+    listContainer.innerHTML = '';
+
+    const titleMap = { colostrum: "Colostrum Care Packs", transitional: "Transitional Milk Options", mature: "Mature Milk Batches" };
+    modalTitle.innerText = titleMap[category] || "Available Products";
+
+    const items = productDatabase[category] || [];
+    items.forEach(prod => {
+        const itemHtml = `
+            <div class="shop-product-item">
+                <div class="product-meta-block">
+                    <img src="${prod.image}" alt="${prod.name}" class="product-thumbnail-frame">
+                    <div class="shop-info-row">
+                        <div class="shop-details">
+                            <h4>${prod.name}</h4>
+                            <p class="source-shop">Supplier: ${prod.shop}</p>
+                            <p class="product-caption-desc">${prod.description}</p>
+                        </div>
+                        <div class="rating-container">
+                            <span class="star-badge">★ ${prod.rating}</span>
+                            <span class="review-count">(${prod.reviews} reviews)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="action-buttons-row">
+                    <button class="order-btn" onclick="openOrderDrawer('${prod.name}', '${prod.shop}', '${prod.unit}')">Request Order</button>
+                </div>
+            </div>
+        `;
+        listContainer.innerHTML += itemHtml;
+    });
+
+    document.getElementById('productsModal').style.display = 'flex';
+}
+
+function closePopup() {
+    document.getElementById('productsModal').style.display = 'none';
+}
+
+function openOrderDrawer(productName, shopName, unitName) {
+    closePopup();
+    currentSelectedProductInfo = { name: productName, shop: shopName, unit: unitName };
+    document.getElementById('checkoutProductDetails').value = `${productName}\nSupplier: ${shopName}`;
+    document.getElementById('quantityFieldLabel').innerText = `Quantity (${unitName})`;
+    
+    document.getElementById('drawerOverlay').style.display = 'block';
     document.getElementById('receiverDrawer').classList.add('open');
+    setTimeout(() => { if(deliveryMap) deliveryMap.invalidateSize(); }, 300);
+}
+
+function openDonorDrawer() {
+    document.getElementById('drawerOverlay').style.display = 'block';
+    document.getElementById('donorDrawer').classList.add('open');
 }
 
 function dismissActiveDrawer() {
+    document.getElementById('drawerOverlay').style.display = 'none';
     document.getElementById('receiverDrawer').classList.remove('open');
+    document.getElementById('donorDrawer').classList.remove('open');
 }
 
-function showProducts(cat) { document.getElementById('productsModal').style.display = 'flex'; }
-function closePopup() { document.getElementById('productsModal').style.display = 'none'; }
-function openTrackModal() { alert("Tracking feature active."); }
-function openDonorDrawer() { alert("Donor form opening."); }
+function openTrackModal() {
+    document.getElementById('trackModal').style.display = 'flex';
+}
+
+function closeTrackModal() {
+    document.getElementById('trackModal').style.display = 'none';
+}
+
+function closeReceiptModal() {
+    document.getElementById('receiptModal').style.display = 'none';
+}
+
+async function submitOrder(e) {
+    e.preventDefault();
+    const name = document.getElementById('orderCustName').value;
+    const phone = document.getElementById('orderCustPhone').value;
+    const priority = document.getElementById('patientPriority').value;
+    const address = document.getElementById('deliveryAddressText').value;
+    const qty = document.getElementById('orderQuantityInput').value;
+
+    const orderId = 'UMMA-' + Math.floor(100000 + Math.random() * 900000);
+    const newOrder = {
+        id: orderId,
+        customerName: name,
+        phone: phone,
+        priority: priority,
+        address: address,
+        quantity: `${qty} ${currentSelectedProductInfo.unit}`,
+        productName: currentSelectedProductInfo.name,
+        status: 'Order Received',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    try {
+        await db.collection("orders").doc(orderId).set(newOrder);
+
+        dismissActiveDrawer();
+
+        document.getElementById('receiptTrackingId').innerText = orderId;
+        document.getElementById('receiptItemName').innerText = `${currentSelectedProductInfo.name} (${qty} ${currentSelectedProductInfo.unit}) - [${priority}]`;
+        document.getElementById('receiptCustomerName').innerText = `Name: ${name} | Phone: ${phone}`;
+        document.getElementById('receiptAddress').innerText = `Delivery Address: ${address}`;
+        document.getElementById('receiptModal').style.display = 'flex';
+    } catch (error) {
+        alert("Error sending order: " + error.message);
+    }
+}
+
+async function submitDonor(e) {
+    e.preventDefault();
+    const name = document.getElementById('donorName').value;
+    const phone = document.getElementById('donorPhone').value;
+    const address = document.getElementById('donorAddress').value;
+    const volume = document.getElementById('donorVolume').value;
+    const exprDate = document.getElementById('donorDate').value;
+
+    const donorId = 'DNR-' + Math.floor(100000 + Math.random() * 900000);
+    const newDonor = {
+        id: donorId,
+        name: name,
+        phone: phone,
+        address: address,
+        volume: `${volume} Liters`,
+        exprDate: exprDate,
+        status: 'Pending Collection',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    try {
+        await db.collection("donors").doc(donorId).set(newDonor);
+
+        dismissActiveDrawer();
+
+        document.getElementById('receiptTrackingId').innerText = donorId;
+        document.getElementById('receiptItemName').innerText = `Milk Donor Application (${volume} Liters)`;
+        document.getElementById('receiptCustomerName').innerText = `Donor Name: ${name} | Phone: ${phone}`;
+        document.getElementById('receiptAddress').innerText = `Pickup Address: ${address}`;
+        document.getElementById('receiptModal').style.display = 'flex';
+    } catch (error) {
+        alert("Error sending donor info: " + error.message);
+    }
+}
+
+async function performTracking() {
+    const query = document.getElementById('trackInput').value.trim().toUpperCase();
+    const resultContainer = document.getElementById('trackingResultContainer');
+
+    if (!query) {
+        resultContainer.innerHTML = `<p style="color: #EF4444; font-weight: 700;">Please enter a Tracking Number or Donor ID.</p>`;
+        return;
+    }
+
+    resultContainer.innerHTML = `<p style="color: #64748B;">Searching Cloud Database...</p>`;
+
+    try {
+        const orderDoc = await db.collection("orders").doc(query).get();
+        if (orderDoc.exists) {
+            const foundOrder = orderDoc.data();
+            resultContainer.innerHTML = `
+                <div style="background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 12px; padding: 16px;">
+                    <h4 style="margin-top:0; color:#112A61;">📦 Customer Order Found (${foundOrder.id})</h4>
+                    <p style="margin: 6px 0;"><strong>Customer Name:</strong> ${foundOrder.customerName}</p>
+                    <p style="margin: 6px 0;"><strong>Product:</strong> ${foundOrder.productName} (${foundOrder.quantity})</p>
+                    <p style="margin: 6px 0;"><strong>Priority Level:</strong> ${foundOrder.priority || 'N/A'}</p>
+                    <p style="margin: 6px 0;"><strong>Status:</strong> <span class="status-pill status-preparing">${foundOrder.status}</span></p>
+                    <p style="margin: 6px 0;"><strong>Address:</strong> ${foundOrder.address}</p>
+                </div>
+            `;
+            return;
+        }
+
+        const donorDoc = await db.collection("donors").doc(query).get();
+        if (donorDoc.exists) {
+            const foundDonor = donorDoc.data();
+            resultContainer.innerHTML = `
+                <div style="background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 12px; padding: 16px;">
+                    <h4 style="margin-top:0; color:#E25C80;">🥛 Milk Donor Application Found (${foundDonor.id})</h4>
+                    <p style="margin: 6px 0;"><strong>Donor Name:</strong> ${foundDonor.name}</p>
+                    <p style="margin: 6px 0;"><strong>Volume:</strong> ${foundDonor.volume} | <strong>Expression Date:</strong> ${foundDonor.exprDate}</p>
+                    <p style="margin: 6px 0;"><strong>Status:</strong> <span class="status-pill status-received">${foundDonor.status}</span></p>
+                    <p style="margin: 6px 0;"><strong>Pickup Address:</strong> ${foundDonor.address}</p>
+                </div>
+            `;
+            return;
+        }
+
+        resultContainer.innerHTML = `<p style="color: #64748B; font-weight: 600;">No record found in the cloud for ID: <strong>${query}</strong>.</p>`;
+    } catch (error) {
+        resultContainer.innerHTML = `<p style="color: #EF4444;">Search error: ${error.message}</p>`;
+    }
+}
 </script>
 
 </body>
