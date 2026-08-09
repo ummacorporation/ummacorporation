@@ -369,7 +369,7 @@
         .grab-field input, .grab-field textarea, .grab-field select { width: 100%; padding: 11px; border: 2px solid #EAEFF5; border-radius: 8px; font-size: 14px; transition: border-color 0.2s ease; }
         .grab-field input:focus, .grab-field textarea:focus, .grab-field select:focus { border-color: #4A90E2; outline: none; }
         
-        .form-map-container { width: 100%; height: 200px; border-radius: 12px; border: 3px solid #0F172A; margin-top: 6px; overflow: hidden; position: relative; }
+        .form-map-container { width: 100%; height: 220px; min-height: 220px; border-radius: 12px; border: 3px solid #0F172A; margin-top: 6px; overflow: hidden; position: relative; }
         .map-hint-text { font-size: 12px; color: #64748B; margin-top: 4px; font-style: italic; }
 
         .drawer-footer { padding: 20px 24px; border-top: 1px solid #EAEFF5; background: #FCFDFE; }
@@ -417,6 +417,8 @@
             .logo span.subtitle-badge { display: none; }
             .directory-layout { flex-direction: column; }
             .directory-map-graphic { min-width: 100%; }
+            .map-frame-outer { min-height: 320px; }
+            .form-map-container { height: 220px; min-height: 220px; }
             .product-meta-block { flex-direction: column; align-items: center; text-align: center; }
             .shop-info-row { flex-direction: column; align-items: center; gap: 10px; }
             .rating-container { align-items: center; text-align: center; }
@@ -536,7 +538,6 @@
     </div>
 </div>
 
-<!-- TRACK ORDER MODAL - Na-update para maka-accept pud sa Donor ID (DNR-...) -->
 <div class="modal-overlay" id="trackModal">
     <div class="products-popup">
         <div class="popup-header">
@@ -583,7 +584,6 @@
     <div class="drawer-footer"><button type="submit" form="ummaReceiverForm" class="grab-submit-btn">Confirm Order Request</button></div>
 </div>
 
-<!-- DONOR APPLICATION FORM -->
 <div class="grab-side-drawer" id="donorDrawer">
     <div class="drawer-header"><h2 class="drawer-title">Donor Registration Form</h2><span class="close-drawer" onclick="dismissActiveDrawer()">&times;</span></div>
     <div class="drawer-body">
@@ -642,6 +642,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     initDeliveryFormMap();
+    
+    // Fix mobile loading size issue on window resize
+    window.addEventListener('resize', () => {
+        if (map) map.invalidateSize();
+        if (deliveryMap) deliveryMap.invalidateSize();
+    });
 });
 
 function initDeliveryFormMap() {
@@ -833,7 +839,6 @@ function submitDonor(e) {
     document.getElementById('receiptModal').style.display = 'flex';
 }
 
-// Gi-update ang tracking function aron ma-check ang Orders ug Donor IDs
 function performTracking() {
     const query = document.getElementById('trackInput').value.trim().toUpperCase();
     const resultContainer = document.getElementById('trackingResultContainer');
