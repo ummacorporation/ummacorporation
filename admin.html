@@ -84,7 +84,6 @@
             box-shadow: 0 12px 36px rgba(17, 42, 97, 0.08);
         }
 
-        /* TAB CONTROLS */
         .tab-menu {
             display: flex;
             gap: 10px;
@@ -132,7 +131,6 @@
             font-weight: 700;
             border-radius: 12px;
             cursor: pointer;
-            transition: all 0.2s ease;
         }
         .refresh-btn:hover { background: #D6E8FF; }
 
@@ -145,7 +143,6 @@
             border-radius: 12px;
             cursor: pointer;
             margin-left: 10px;
-            transition: background 0.2s ease;
         }
         .clear-all-btn:hover { background: #DC2626; }
 
@@ -158,13 +155,11 @@
             font-size: 13px;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s ease;
             margin-left: 10px;
         }
         .delete-single-btn:hover {
             background: #EF4444;
             color: white;
-            border-color: #EF4444;
         }
 
         .admin-card {
@@ -173,9 +168,7 @@
             border-radius: 16px;
             padding: 20px;
             margin-bottom: 18px;
-            transition: all 0.2s ease;
         }
-        .admin-card:hover { border-color: #CBD5E1; }
 
         .admin-card-header {
             display: flex;
@@ -214,7 +207,6 @@
             font-weight: 700;
             color: #112A61;
             background: #FFFFFF;
-            cursor: pointer;
         }
 
         .pickup-date-input {
@@ -223,7 +215,6 @@
             border: 2px solid #BCE3FF;
             font-weight: 600;
             color: #112A61;
-            background: #FFFFFF;
             font-size: 13px;
         }
 
@@ -258,18 +249,17 @@
 <div class="main-container">
     <div class="admin-panel-card">
         
-        <!-- TABS FOR NAVIGATION -->
         <div class="tab-menu">
             <button class="tab-btn active" id="tabOrdersBtn" onclick="switchTab('orders')">📦 Customer Orders</button>
             <button class="tab-btn" id="tabDonorsBtn" onclick="switchTab('donors')">🥛 Milk Donors</button>
         </div>
 
-        <!-- SECTION 1: CUSTOMER ORDERS -->
+        <!-- ORDERS SECTION -->
         <div id="ordersSection">
             <div class="panel-header">
                 <div>
                     <h2 class="panel-title">Customer Live Orders</h2>
-                    <span style="font-size: 13px; color: #64748B;">Update delivery status or delete single completed/invalid orders.</span>
+                    <span style="font-size: 13px; color: #64748B;">Manage and update customer delivery statuses.</span>
                 </div>
                 <div>
                     <button class="refresh-btn" onclick="renderOrders()">↻ Refresh</button>
@@ -279,12 +269,12 @@
             <div id="adminOrdersContainer"></div>
         </div>
 
-        <!-- SECTION 2: MILK DONORS -->
+        <!-- DONORS SECTION -->
         <div id="donorsSection" style="display: none;">
             <div class="panel-header">
                 <div>
                     <h2 class="panel-title">Milk Donor Applications</h2>
-                    <span style="font-size: 13px; color: #64748B;">View registered donors, schedule collection, or update fulfillment status.</span>
+                    <span style="font-size: 13px; color: #64748B;">Manage donor collections and status updates.</span>
                 </div>
                 <div>
                     <button class="refresh-btn" onclick="renderDonors()">↻ Refresh</button>
@@ -317,12 +307,18 @@ function switchTab(tab) {
     }
 }
 
-/* CUSTOMER ORDERS LOGIC */
+/* DATABASE RENDERING & MANAGEMENT FUNCTIONS */
 function renderOrders() {
     const container = document.getElementById('adminOrdersContainer');
-    const orders = JSON.parse(localStorage.getItem('umma_orders') || '[]');
+    let orders = [];
+    
+    try {
+        orders = JSON.parse(localStorage.getItem('umma_orders') || '[]');
+    } catch (e) {
+        orders = [];
+    }
 
-    if (orders.length === 0) {
+    if (!Array.isArray(orders) || orders.length === 0) {
         container.innerHTML = `<div class="empty-state"><h3>No Customer Orders Found</h3><p>When customers place orders, they will automatically appear here.</p></div>`;
         return;
     }
@@ -332,7 +328,7 @@ function renderOrders() {
             <div class="admin-card-header">
                 <div>
                     <span class="tracking-id">${order.id || 'N/A'}</span>
-                    <span style="font-size: 12px; color: #64748B; margin-left: 10px;">Placed: ${order.date || ''}</span>
+                    <span style="font-size: 12px; color: #64748B; margin-left: 10px;">Placed: ${order.date || 'N/A'}</span>
                 </div>
                 <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
                     <label style="font-size: 13px; font-weight: 700; color: #112A61;">Status:</label>
@@ -342,14 +338,14 @@ function renderOrders() {
                         <option value="In Transit" ${order.status === 'In Transit' ? 'selected' : ''}>In Transit</option>
                         <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
                     </select>
-                    <button class="delete-single-btn" onclick="deleteSingleOrder('${order.id}')">✕ Delete Order</button>
+                    <button class="delete-single-btn" onclick="deleteSingleOrder('${order.id}')">✕ Delete</button>
                 </div>
             </div>
             <div class="info-body">
-                <p style="margin: 4px 0;"><strong>Customer Name:</strong> ${order.customerName || ''} | <strong>Phone:</strong> ${order.phone || ''}</p>
-                <p style="margin: 4px 0;"><strong>Product Ordered:</strong> ${order.productName || ''} (${order.quantity || ''})</p>
-                <p style="margin: 4px 0;"><strong>Supplier Hub:</strong> ${order.hub || ''}</p>
-                <p style="margin: 4px 0; color: #112A61;"><strong>Delivery Target Address:</strong> ${order.address || ''}</p>
+                <p style="margin: 4px 0;"><strong>Customer:</strong> ${order.customerName || 'N/A'} | <strong>Phone:</strong> ${order.phone || 'N/A'}</p>
+                <p style="margin: 4px 0;"><strong>Product:</strong> ${order.productName || 'N/A'} (${order.quantity || 'N/A'})</p>
+                <p style="margin: 4px 0;"><strong>Hub:</strong> ${order.hub || 'N/A'}</p>
+                <p style="margin: 4px 0; color: #112A61;"><strong>Address:</strong> ${order.address || 'N/A'}</p>
             </div>
         </div>
     `).join('');
@@ -366,7 +362,7 @@ function updateOrderStatus(id, newStatus) {
 }
 
 function deleteSingleOrder(id) {
-    if (confirm(`Are you sure you want to delete Order ID: ${id}?`)) {
+    if (confirm(`Delete Order ID: ${id}?`)) {
         let orders = JSON.parse(localStorage.getItem('umma_orders') || '[]');
         orders = orders.filter(o => o.id !== id);
         localStorage.setItem('umma_orders', JSON.stringify(orders));
@@ -375,19 +371,24 @@ function deleteSingleOrder(id) {
 }
 
 function clearAllOrders() {
-    if (confirm("WARNING: Are you sure you want to delete ALL Customer Orders?")) {
+    if (confirm("Delete ALL Customer Orders?")) {
         localStorage.removeItem('umma_orders');
         renderOrders();
     }
 }
 
-/* MILK DONORS LOGIC */
 function renderDonors() {
     const container = document.getElementById('adminDonorsContainer');
-    const donors = JSON.parse(localStorage.getItem('umma_donors') || '[]');
+    let donors = [];
 
-    if (donors.length === 0) {
-        container.innerHTML = `<div class="empty-state"><h3>No Donor Applications Found</h3><p>When mothers apply via "Be a Milk Donor", their details will show up here.</p></div>`;
+    try {
+        donors = JSON.parse(localStorage.getItem('umma_donors') || '[]');
+    } catch (e) {
+        donors = [];
+    }
+
+    if (!Array.isArray(donors) || donors.length === 0) {
+        container.innerHTML = `<div class="empty-state"><h3>No Donor Applications Found</h3><p>When mothers apply via "Be a Milk Donor", details will show up here.</p></div>`;
         return;
     }
 
@@ -400,10 +401,10 @@ function renderDonors() {
                 <div class="admin-card-header">
                     <div>
                         <span class="donor-id">${donor.id || 'N/A'}</span>
-                        <span style="font-size: 12px; color: #64748B; margin-left: 10px;">Applied: ${donor.date || ''}</span>
+                        <span style="font-size: 12px; color: #64748B; margin-left: 10px;">Applied: ${donor.date || 'N/A'}</span>
                     </div>
                     <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
-                        <label style="font-size: 13px; font-weight: 700; color: #112A61;">Donor Status:</label>
+                        <label style="font-size: 13px; font-weight: 700; color: #112A61;">Status:</label>
                         <select class="status-select" onchange="updateDonorStatus('${donor.id}', this.value, this)">
                             <option value="Pending Collection" ${baseStatus === 'Pending Collection' ? 'selected' : ''}>Pending Collection</option>
                             <option value="Scheduled Pickup" ${baseStatus === 'Scheduled Pickup' ? 'selected' : ''}>Scheduled Pickup</option>
@@ -412,14 +413,14 @@ function renderDonors() {
                         
                         <input type="datetime-local" class="pickup-date-input" value="${donor.pickupDate || ''}" style="display: ${baseStatus === 'Scheduled Pickup' ? 'inline-block' : 'none'};" onchange="updatePickupDate('${donor.id}', this.value)">
 
-                        <button class="delete-single-btn" onclick="deleteSingleDonor('${donor.id}')">✕ Delete Donor</button>
+                        <button class="delete-single-btn" onclick="deleteSingleDonor('${donor.id}')">✕ Delete</button>
                     </div>
                 </div>
                 <div class="info-body">
-                    <p style="margin: 4px 0;"><strong>Donor Name:</strong> ${donor.name || ''} | <strong>Phone:</strong> ${donor.phone || ''}</p>
-                    <p style="margin: 4px 0;"><strong>Estimated Volume:</strong> ${donor.volume || ''} | <strong>Expression Date:</strong> ${donor.exprDate || ''}</p>
-                    <p style="margin: 4px 0; color: #112A61;"><strong>Pickup Address:</strong> ${donor.address || ''}</p>
-                    ${isScheduled ? `<p style="margin: 4px 0; color: #E25C80; font-weight: 700;">Scheduled Pickup Date & Time: ${donor.pickupDate ? new Date(donor.pickupDate).toLocaleString() : 'Not set'}</p>` : ''}
+                    <p style="margin: 4px 0;"><strong>Donor Name:</strong> ${donor.name || 'N/A'} | <strong>Phone:</strong> ${donor.phone || 'N/A'}</p>
+                    <p style="margin: 4px 0;"><strong>Volume:</strong> ${donor.volume || 'N/A'} | <strong>Expression Date:</strong> ${donor.exprDate || 'N/A'}</p>
+                    <p style="margin: 4px 0; color: #112A61;"><strong>Pickup Address:</strong> ${donor.address || 'N/A'}</p>
+                    ${isScheduled ? `<p style="margin: 4px 0; color: #E25C80; font-weight: 700;">Pickup Schedule: ${donor.pickupDate ? new Date(donor.pickupDate).toLocaleString() : 'Not set'}</p>` : ''}
                 </div>
             </div>
         `;
@@ -457,7 +458,7 @@ function updatePickupDate(id, dateTimeVal) {
 }
 
 function deleteSingleDonor(id) {
-    if (confirm(`Are you sure you want to delete Donor Record ID: ${id}?`)) {
+    if (confirm(`Delete Donor Record ID: ${id}?`)) {
         let donors = JSON.parse(localStorage.getItem('umma_donors') || '[]');
         donors = donors.filter(d => d.id !== id);
         localStorage.setItem('umma_donors', JSON.stringify(donors));
@@ -466,11 +467,20 @@ function deleteSingleDonor(id) {
 }
 
 function clearAllDonors() {
-    if (confirm("WARNING: Are you sure you want to delete ALL Donor Applications?")) {
+    if (confirm("Delete ALL Donor Applications?")) {
         localStorage.removeItem('umma_donors');
         renderDonors();
     }
 }
+
+// Auto-sync kung naay mausab sa localStorage gikan sa laing tab/form
+window.addEventListener('storage', (event) => {
+    if (event.key === 'umma_orders') {
+        renderOrders();
+    } else if (event.key === 'umma_donors') {
+        renderDonors();
+    }
+});
 
 document.addEventListener('DOMContentLoaded', () => {
     renderOrders();
