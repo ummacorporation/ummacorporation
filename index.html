@@ -85,70 +85,19 @@
         .grab-field input, .grab-field textarea, .grab-field select { width: 100%; padding: 11px; border: 2px solid #EAEFF5; border-radius: 8px; font-size: 14px; background: #fff; }
         
         .form-map-container { width: 100%; height: 200px; border-radius: 12px; border: 2px solid #0F172A; margin-top: 6px; }
+        .drawer-footer { padding: 20px 24px; border-top: 1px solid #EAEFF5; background: #FCFDFE; }
         .grab-submit-btn { width: 100%; padding: 15px; background: #E25C80; color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 15px; }
         .drawer-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.3); z-index: 2500; }
 
         .order-receipt-box { background: #F8FAFC; border: 2px dashed #4A90E2; border-radius: 16px; padding: 20px; margin-top: 15px; }
         .tracking-id-badge { background: #112A61; color: #38BDF8; font-family: monospace; font-size: 18px; padding: 8px 14px; border-radius: 8px; display: inline-block; font-weight: 800; margin: 10px 0; }
+        .status-pill { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 800; display: inline-block; }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="logo-container" onclick="resetToGlobalView()">
-        <img src="Logo.png" alt="Logo" class="logo-graphic">
-        <div class="logo">
-            UMMA <div class="korean-divider">|</div> <div class="korean-text">엄마</div>
-        </div>
-    </div>
-    <div class="header-actions">
-        <button class="header-track-btn" onclick="openTrackModal()">Track Order</button>
-        <button class="header-donor-btn" onclick="openDonorDrawer()">Be a Milk Donor</button>
-    </div>
-</header>
+<!-- (Pabilin ang imong orihinal nga HTML structure diri...) -->
 
-<section class="hero-section"><img src="Logo.png" alt="Logo" class="hero-logo-frame"></section>
-
-<main class="main-content">
-    <div class="main-content-wrapper">
-        <div class="section-title">Explore Milk Products</div>
-        <div class="cards-grid">
-            <div class="category-card colostrum" onclick="showProducts('colostrum')"><h3 class="category-name">Colostrum</h3></div>
-            <div class="category-card transitional" onclick="showProducts('transitional')"><h3 class="category-name">Transitional</h3></div>
-            <div class="category-card mature" onclick="showProducts('mature')"><h3 class="category-name">Mature</h3></div>
-        </div>
-        <div id="liveSatelliteMap" style="width: 100%; height: 400px; margin-top: 40px; border-radius: 20px;"></div>
-    </div>
-</main>
-
-<div class="modal-overlay" id="productsModal">
-    <div class="products-popup">
-        <div class="popup-header"><h3 id="modalTitle">Available Products</h3><span class="close-popup" onclick="closePopup()">&times;</span></div>
-        <div class="popup-body" id="modalProductList"></div>
-    </div>
-</div>
-
-<div class="drawer-overlay" id="drawerOverlay" onclick="dismissActiveDrawer()"></div>
-<div class="grab-side-drawer" id="receiverDrawer">
-    <div class="drawer-header"><h2>Order Request</h2><span class="close-drawer" onclick="dismissActiveDrawer()">&times;</span></div>
-    <div class="drawer-body">
-        <form id="ummaReceiverForm" onsubmit="submitOrder(event)">
-            <div class="grab-field"><label>Full Name</label><input type="text" id="orderCustName" required></div>
-            <div class="grab-field"><label>Phone</label><input type="tel" id="orderCustPhone" required></div>
-            <div class="grab-field"><label>Priority</label>
-                <select id="patientPriority">
-                    <option value="Emergency">Emergency</option>
-                    <option value="Normal">Normal</option>
-                </select>
-            </div>
-            <div class="grab-field"><label>Address</label><textarea id="deliveryAddressText" required></textarea></div>
-            <div class="form-map-container" id="deliveryFormMap"></div>
-            <button type="submit" class="grab-submit-btn">Confirm Order Request</button>
-        </form>
-    </div>
-</div>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const firebaseConfig = {
     apiKey: "AIzaSyDFcVKUXi7S0KbIwLAHd9icy502SxIcu4",
@@ -160,50 +109,11 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-// Diri ang gi-fix para sa imong custom database
+
+// ANG GIAYO NGA LINYA PARA MOGANA SA 'ummadatabase'
 const db = firebase.app().firestore("ummadatabase");
 
-function initMap() {
-    const map = L.map('liveSatelliteMap').setView([14.5547, 121.0244], 17);
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
-}
-initMap();
-
-function showProducts(cat) {
-    document.getElementById('modalProductList').innerHTML = `<button class="order-btn" onclick="openOrderDrawer('Sample')">Request Order</button>`;
-    document.getElementById('productsModal').style.display = 'flex';
-}
-
-function openOrderDrawer(name) {
-    closePopup();
-    document.getElementById('drawerOverlay').style.display = 'block';
-    document.getElementById('receiverDrawer').classList.add('open');
-}
-
-function dismissActiveDrawer() {
-    document.getElementById('drawerOverlay').style.display = 'none';
-    document.getElementById('receiverDrawer').classList.remove('open');
-}
-
-async function submitOrder(e) {
-    e.preventDefault();
-    const orderId = 'UMMA-' + Math.floor(Math.random() * 900000);
-    const data = {
-        name: document.getElementById('orderCustName').value,
-        phone: document.getElementById('orderCustPhone').value,
-        priority: document.getElementById('patientPriority').value,
-        address: document.getElementById('deliveryAddressText').value
-    };
-    try {
-        await db.collection("orders").doc(orderId).set(data);
-        alert("Order Submitted!");
-        dismissActiveDrawer();
-    } catch (err) { alert(err.message); }
-}
-
-function closePopup() { document.getElementById('productsModal').style.display = 'none'; }
-function openTrackModal() { alert("Track function active"); }
-function openDonorDrawer() { alert("Donor function active"); }
+// ... (Pabilin ang tanan nimong functions sama sa submitOrder, openOrderDrawer, etc.)
 </script>
 </body>
 </html>
