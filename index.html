@@ -366,7 +366,7 @@
         .drawer-body { padding: 24px; overflow-y: auto; flex: 1; }
         .grab-field { margin-bottom: 16px; }
         .grab-field label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 6px; color: #112A61; }
-        .grab-field input, .grab-field textarea, .grab-field select { width: 100%; padding: 11px; border: 2px solid #EAEFF5; border-radius: 8px; font-size: 14px; transition: border-color 0.2s ease; }
+        .grab-field input, .grab-field textarea, .grab-field select { width: 100%; padding: 11px; border: 2px solid #EAEFF5; border-radius: 8px; font-size: 14px; transition: border-color 0.2s ease; background-color: #fff; }
         .grab-field input:focus, .grab-field textarea:focus, .grab-field select:focus { border-color: #4A90E2; outline: none; }
         
         .form-map-container { width: 100%; height: 220px; min-height: 220px; border-radius: 12px; border: 3px solid #0F172A; margin-top: 6px; overflow: hidden; position: relative; }
@@ -566,6 +566,17 @@
             <div class="grab-field"><label>Full Name</label><input type="text" id="orderCustName" placeholder="Enter full name" required></div>
             <div class="grab-field"><label>Phone Number</label><input type="tel" id="orderCustPhone" placeholder="09XXXXXXXXX" required></div>
             
+            <!-- DROPDOWN MENU PARA SA PRIORITY LEVEL -->
+            <div class="grab-field">
+                <label>Patient Priority Level (Dropdown Menu)</label>
+                <select id="patientPriority" required>
+                    <option value="" disabled selected>-- Pilia ang Priority Level --</option>
+                    <option value="Emergency NICU / Premature">Emergency NICU / Premature (Urgent)</option>
+                    <option value="Normal Newborn Care">Normal Newborn Care</option>
+                    <option value="Medical Supplement">Medical Supplement</option>
+                </select>
+            </div>
+
             <div class="grab-field">
                 <label>Home Delivery Address & Pin</label>
                 <textarea id="deliveryAddressText" rows="2" placeholder="Enter address or tap the map below to pinpoint exact delivery coordinates" required></textarea>
@@ -643,7 +654,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     initDeliveryFormMap();
     
-    // Fix mobile loading size issue on window resize
     window.addEventListener('resize', () => {
         if (map) map.invalidateSize();
         if (deliveryMap) deliveryMap.invalidateSize();
@@ -780,6 +790,7 @@ function submitOrder(e) {
     e.preventDefault();
     const name = document.getElementById('orderCustName').value;
     const phone = document.getElementById('orderCustPhone').value;
+    const priority = document.getElementById('patientPriority').value;
     const address = document.getElementById('deliveryAddressText').value;
     const qty = document.getElementById('orderQuantityInput').value;
 
@@ -788,6 +799,7 @@ function submitOrder(e) {
         id: orderId,
         customerName: name,
         phone: phone,
+        priority: priority,
         address: address,
         quantity: `${qty} ${currentSelectedProductInfo.unit}`,
         productName: currentSelectedProductInfo.name,
@@ -801,7 +813,7 @@ function submitOrder(e) {
     dismissActiveDrawer();
 
     document.getElementById('receiptTrackingId').innerText = orderId;
-    document.getElementById('receiptItemName').innerText = `${currentSelectedProductInfo.name} (${qty} ${currentSelectedProductInfo.unit})`;
+    document.getElementById('receiptItemName').innerText = `${currentSelectedProductInfo.name} (${qty} ${currentSelectedProductInfo.unit}) - [${priority}]`;
     document.getElementById('receiptCustomerName').innerText = `Name: ${name} | Phone: ${phone}`;
     document.getElementById('receiptAddress').innerText = `Delivery Address: ${address}`;
     document.getElementById('receiptModal').style.display = 'flex';
@@ -862,6 +874,7 @@ function performTracking() {
                 <h4 style="margin-top:0; color:#112A61;">📦 Customer Order Found (${foundOrder.id})</h4>
                 <p style="margin: 6px 0;"><strong>Customer Name:</strong> ${foundOrder.customerName}</p>
                 <p style="margin: 6px 0;"><strong>Product:</strong> ${foundOrder.productName} (${foundOrder.quantity})</p>
+                <p style="margin: 6px 0;"><strong>Priority Level:</strong> ${foundOrder.priority || 'N/A'}</p>
                 <p style="margin: 6px 0;"><strong>Status:</strong> <span class="status-pill status-preparing">${foundOrder.status}</span></p>
                 <p style="margin: 6px 0;"><strong>Address:</strong> ${foundOrder.address}</p>
             </div>
