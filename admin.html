@@ -6,11 +6,6 @@
     <title>UMMA | Owner Admin Portal</title>
     <link rel="icon" type="image/png" href="Logo.png">
 
-    <!-- Firebase App (Core) SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <!-- Firebase Realtime Database SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-
     <style>
         * {
             box-sizing: border-box;
@@ -303,183 +298,183 @@
 </div>
 
 <script>
-    // Initialize Firebase with your configured credentials
-    const firebaseConfig = {
-        apiKey: "AIzaSyDFcVKUXi7S0KbIwLAtHd9icy5O2SxIcu4",
-        authDomain: "umma-milk-system-7bb00.firebaseapp.com",
-        databaseURL: "https://umma-milk-system-7bb00-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "umma-milk-system-7bb00",
-        storageBucket: "umma-milk-system-7bb00.appspot.com",
-        messagingSenderId: "223191939316",
-        appId: "1:223191939316:web:20b44a7998019c557006a1"
-    };
+let currentTab = 'orders';
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+function switchTab(tab) {
+    currentTab = tab;
+    if (tab === 'orders') {
+        document.getElementById('ordersSection').style.display = 'block';
+        document.getElementById('donorsSection').style.display = 'none';
+        document.getElementById('tabOrdersBtn').classList.add('active');
+        document.getElementById('tabDonorsBtn').classList.remove('active');
+        renderOrders();
+    } else {
+        document.getElementById('ordersSection').style.display = 'none';
+        document.getElementById('donorsSection').style.display = 'block';
+        document.getElementById('tabOrdersBtn').classList.remove('active');
+        document.getElementById('tabDonorsBtn').classList.add('active');
+        renderDonors();
+    }
+}
 
-    let currentTab = 'orders';
+/* CUSTOMER ORDERS LOGIC */
+function renderOrders() {
+    const container = document.getElementById('adminOrdersContainer');
+    const orders = JSON.parse(localStorage.getItem('umma_orders') || '[]');
 
-    function switchTab(tab) {
-        currentTab = tab;
-        if (tab === 'orders') {
-            document.getElementById('ordersSection').style.display = 'block';
-            document.getElementById('donorsSection').style.display = 'none';
-            document.getElementById('tabOrdersBtn').classList.add('active');
-            document.getElementById('tabDonorsBtn').classList.remove('active');
-            renderOrders();
-        } else {
-            document.getElementById('ordersSection').style.display = 'none';
-            document.getElementById('donorsSection').style.display = 'block';
-            document.getElementById('tabOrdersBtn').classList.remove('active');
-            document.getElementById('tabDonorsBtn').classList.add('active');
-            renderDonors();
-        }
+    if (orders.length === 0) {
+        container.innerHTML = `<div class="empty-state"><h3>No Customer Orders Found</h3><p>When customers place orders, they will automatically appear here.</p></div>`;
+        return;
     }
 
-    /* CUSTOMER ORDERS LOGIC (FIREBASE) */
-    function renderOrders() {
-        const container = document.getElementById('adminOrdersContainer');
+    container.innerHTML = orders.map(order => `
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <div>
+                    <span class="tracking-id">${order.id}</span>
+                    <span style="font-size: 12px; color: #64748B; margin-left: 10px;">Placed: ${order.date}</span>
+                </div>
+                <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <label style="font-size: 13px; font-weight: 700; color: #112A61;">Status:</label>
+                    <select class="status-select" onchange="updateOrderStatus('${order.id}', this.value)">
+                        <option value="Order Received" ${order.status === 'Order Received' ? 'selected' : ''}>Order Received</option>
+                        <option value="Preparing" ${order.status === 'Preparing' ? 'selected' : ''}>Preparing</option>
+                        <option value="In Transit" ${order.status === 'In Transit' ? 'selected' : ''}>In Transit</option>
+                        <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                    </select>
+                    <button class="delete-single-btn" onclick="deleteSingleOrder('${order.id}')">✕ Delete Order</button>
+                </div>
+            </div>
+            <div class="info-body">
+                <p style="margin: 4px 0;"><strong>Customer Name:</strong> ${order.customerName} | <strong>Phone:</strong> ${order.phone}</p>
+                <p style="margin: 4px 0;"><strong>Product Ordered:</strong> ${order.productName} (${order.quantity})</p>
+                <p style="margin: 4px 0;"><strong>Supplier Hub:</strong> ${order.hub}</p>
+                <p style="margin: 4px 0; color: #112A61;"><strong>Delivery Target Address:</strong> ${order.address}</p>
+            </div>
+        </div>
+    `).join('');
+}
+
+function updateOrderStatus(id, newStatus) {
+    let orders = JSON.parse(localStorage.getItem('umma_orders') || '[]');
+    const idx = orders.findIndex(o => o.id === id);
+    if (idx !== -1) {
+        orders[idx].status = newStatus;
+        localStorage.setItem('umma_orders', JSON.stringify(orders));
+        renderOrders();
+    }
+}
+
+function deleteSingleOrder(id) {
+    if (confirm(`Are you sure you want to delete Order ID: ${id}?`)) {
+        let orders = JSON.parse(localStorage.getItem('umma_orders') || '[]');
+        orders = orders.filter(o => o.id !== id);
+        localStorage.setItem('umma_orders', JSON.stringify(orders));
+        renderOrders();
+    }
+}
+
+function clearAllOrders() {
+    if (confirm("WARNING: Are you sure you want to delete ALL Customer Orders?")) {
+        localStorage.removeItem('umma_orders');
+        renderOrders();
+    }
+}
+
+/* MILK DONORS LOGIC */
+function renderDonors() {
+    const container = document.getElementById('adminDonorsContainer');
+    const donors = JSON.parse(localStorage.getItem('umma_donors') || '[]');
+
+    if (donors.length === 0) {
+        container.innerHTML = `<div class="empty-state"><h3>No Donor Applications Found</h3><p>When mothers apply via "Be a Milk Donor", their details will show up here.</p></div>`;
+        return;
+    }
+
+    container.innerHTML = donors.map(donor => {
+        const isScheduled = donor.status && donor.status.startsWith('Scheduled');
+        const baseStatus = isScheduled ? 'Scheduled Pickup' : (donor.status || 'Pending Collection');
         
-        db.ref('umma_orders').on('value', (snapshot) => {
-            const data = snapshot.val();
-            const orders = data ? Object.keys(data).map(key => ({ firebaseKey: key, ...data[key] })) : [];
-
-            if (orders.length === 0) {
-                container.innerHTML = `<div class="empty-state"><h3>No Customer Orders Found</h3><p>When customers place orders, they will automatically appear here.</p></div>`;
-                return;
-            }
-
-            container.innerHTML = orders.map(order => `
-                <div class="admin-card">
-                    <div class="admin-card-header">
-                        <div>
-                            <span class="tracking-id">${order.id}</span>
-                            <span style="font-size: 12px; color: #64748B; margin-left: 10px;">Placed: ${order.date}</span>
-                        </div>
-                        <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
-                            <label style="font-size: 13px; font-weight: 700; color: #112A61;">Status:</label>
-                            <select class="status-select" onchange="updateOrderStatus('${order.firebaseKey}', this.value)">
-                                <option value="Order Received" ${order.status === 'Order Received' ? 'selected' : ''}>Order Received</option>
-                                <option value="Preparing" ${order.status === 'Preparing' ? 'selected' : ''}>Preparing</option>
-                                <option value="In Transit" ${order.status === 'In Transit' ? 'selected' : ''}>In Transit</option>
-                                <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
-                            </select>
-                            <button class="delete-single-btn" onclick="deleteSingleOrder('${order.firebaseKey}', '${order.id}')">✕ Delete Order</button>
-                        </div>
+        return `
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <div>
+                        <span class="donor-id">${donor.id}</span>
+                        <span style="font-size: 12px; color: #64748B; margin-left: 10px;">Applied: ${donor.date}</span>
                     </div>
-                    <div class="info-body">
-                        <p style="margin: 4px 0;"><strong>Customer Name:</strong> ${order.customerName} | <strong>Phone:</strong> ${order.phone}</p>
-                        <p style="margin: 4px 0;"><strong>Product Ordered:</strong> ${order.productName} (${order.quantity})</p>
-                        <p style="margin: 4px 0;"><strong>Supplier Hub:</strong> ${order.hub}</p>
-                        <p style="margin: 4px 0; color: #112A61;"><strong>Delivery Target Address:</strong> ${order.address}</p>
+                    <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <label style="font-size: 13px; font-weight: 700; color: #112A61;">Donor Status:</label>
+                        <select class="status-select" onchange="updateDonorStatus('${donor.id}', this.value, this)">
+                            <option value="Pending Collection" ${baseStatus === 'Pending Collection' ? 'selected' : ''}>Pending Collection</option>
+                            <option value="Scheduled Pickup" ${baseStatus === 'Scheduled Pickup' ? 'selected' : ''}>Scheduled Pickup</option>
+                            <option value="Collected" ${baseStatus === 'Collected' ? 'selected' : ''}>Collected</option>
+                        </select>
+                        
+                        <input type="datetime-local" class="pickup-date-input" value="${donor.pickupDate || ''}" style="display: ${baseStatus === 'Scheduled Pickup' ? 'inline-block' : 'none'};" onchange="updatePickupDate('${donor.id}', this.value)">
+
+                        <button class="delete-single-btn" onclick="deleteSingleDonor('${donor.id}')">✕ Delete Donor</button>
                     </div>
                 </div>
-            `).join('');
-        });
-    }
+                <div class="info-body">
+                    <p style="margin: 4px 0;"><strong>Donor Name:</strong> ${donor.name} | <strong>Phone:</strong> ${donor.phone}</p>
+                    <p style="margin: 4px 0;"><strong>Estimated Volume:</strong> ${donor.volume} | <strong>Expression Date:</strong> ${donor.exprDate}</p>
+                    <p style="margin: 4px 0; color: #112A61;"><strong>Pickup Address:</strong> ${donor.address}</p>
+                    ${isScheduled ? `<p style="margin: 4px 0; color: #E25C80; font-weight: 700;">Scheduled Pickup Date & Time: ${donor.pickupDate ? new Date(donor.pickupDate).toLocaleString() : 'Not set'}</p>` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
 
-    function updateOrderStatus(firebaseKey, newStatus) {
-        db.ref(`umma_orders/${firebaseKey}`).update({ status: newStatus });
-    }
+function updateDonorStatus(id, newStatus, selectElement) {
+    let donors = JSON.parse(localStorage.getItem('umma_donors') || '[]');
+    const idx = donors.findIndex(d => d.id === id);
+    const dateInput = selectElement.parentElement.querySelector('.pickup-date-input');
 
-    function deleteSingleOrder(firebaseKey, displayId) {
-        if (confirm(`Are you sure you want to delete Order ID: ${displayId}?`)) {
-            db.ref(`umma_orders/${firebaseKey}`).remove();
-        }
-    }
-
-    function clearAllOrders() {
-        if (confirm("WARNING: Are you sure you want to delete ALL Customer Orders?")) {
-            db.ref('umma_orders').remove();
-        }
-    }
-
-    /* MILK DONORS LOGIC (FIREBASE) */
-    function renderDonors() {
-        const container = document.getElementById('adminDonorsContainer');
-
-        db.ref('umma_donors').on('value', (snapshot) => {
-            const data = snapshot.val();
-            const donors = data ? Object.keys(data).map(key => ({ firebaseKey: key, ...data[key] })) : [];
-
-            if (donors.length === 0) {
-                container.innerHTML = `<div class="empty-state"><h3>No Donor Applications Found</h3><p>When mothers apply via "Be a Milk Donor", their details will show up here.</p></div>`;
-                return;
-            }
-
-            container.innerHTML = donors.map(donor => {
-                const isScheduled = donor.status && donor.status.startsWith('Scheduled');
-                const baseStatus = isScheduled ? 'Scheduled Pickup' : (donor.status || 'Pending Collection');
-                
-                return `
-                    <div class="admin-card">
-                        <div class="admin-card-header">
-                            <div>
-                                <span class="donor-id">${donor.id}</span>
-                                <span style="font-size: 12px; color: #64748B; margin-left: 10px;">Applied: ${donor.date}</span>
-                            </div>
-                            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
-                                <label style="font-size: 13px; font-weight: 700; color: #112A61;">Donor Status:</label>
-                                <select class="status-select" onchange="updateDonorStatus('${donor.firebaseKey}', this.value, this)">
-                                    <option value="Pending Collection" ${baseStatus === 'Pending Collection' ? 'selected' : ''}>Pending Collection</option>
-                                    <option value="Scheduled Pickup" ${baseStatus === 'Scheduled Pickup' ? 'selected' : ''}>Scheduled Pickup</option>
-                                    <option value="Collected" ${baseStatus === 'Collected' ? 'selected' : ''}>Collected</option>
-                                </select>
-                                
-                                <input type="datetime-local" class="pickup-date-input" value="${donor.pickupDate || ''}" style="display: ${baseStatus === 'Scheduled Pickup' ? 'inline-block' : 'none'};" onchange="updatePickupDate('${donor.firebaseKey}', this.value)">
-
-                                <button class="delete-single-btn" onclick="deleteSingleDonor('${donor.firebaseKey}', '${donor.id}')">✕ Delete Donor</button>
-                            </div>
-                        </div>
-                        <div class="info-body">
-                            <p style="margin: 4px 0;"><strong>Donor Name:</strong> ${donor.name} | <strong>Phone:</strong> ${donor.phone}</p>
-                            <p style="margin: 4px 0;"><strong>Estimated Volume:</strong> ${donor.volume} | <strong>Expression Date:</strong> ${donor.exprDate}</p>
-                            <p style="margin: 4px 0; color: #112A61;"><strong>Pickup Address:</strong> ${donor.address}</p>
-                            ${isScheduled ? `<p style="margin: 4px 0; color: #E25C80; font-weight: 700;">Scheduled Pickup Date & Time: ${donor.pickupDate ? new Date(donor.pickupDate).toLocaleString() : 'Not set'}</p>` : ''}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        });
-    }
-
-    function updateDonorStatus(firebaseKey, newStatus, selectElement) {
-        const dateInput = selectElement.parentElement.querySelector('.pickup-date-input');
-        let updatePayload = {};
-
+    if (idx !== -1) {
         if (newStatus === 'Scheduled Pickup') {
             dateInput.style.display = 'inline-block';
-            updatePayload.status = `Scheduled: ${dateInput.value || 'Not set'}`;
+            donors[idx].status = `Scheduled: ${dateInput.value || 'Not set'}`;
         } else {
             dateInput.style.display = 'none';
-            updatePayload.status = newStatus;
-            updatePayload.pickupDate = '';
+            donors[idx].status = newStatus;
+            donors[idx].pickupDate = '';
         }
-        db.ref(`umma_donors/${firebaseKey}`).update(updatePayload);
+        localStorage.setItem('umma_donors', JSON.stringify(donors));
+        renderDonors();
     }
+}
 
-    function updatePickupDate(firebaseKey, dateTimeVal) {
-        db.ref(`umma_donors/${firebaseKey}`).update({
-            pickupDate: dateTimeVal,
-            status: `Scheduled: ${dateTimeVal}`
-        });
+function updatePickupDate(id, dateTimeVal) {
+    let donors = JSON.parse(localStorage.getItem('umma_donors') || '[]');
+    const idx = donors.findIndex(d => d.id === id);
+    if (idx !== -1) {
+        donors[idx].pickupDate = dateTimeVal;
+        donors[idx].status = `Scheduled: ${dateTimeVal}`;
+        localStorage.setItem('umma_donors', JSON.stringify(donors));
+        renderDonors();
     }
+}
 
-    function deleteSingleDonor(firebaseKey, displayId) {
-        if (confirm(`Are you sure you want to delete Donor Record ID: ${displayId}?`)) {
-            db.ref(`umma_donors/${firebaseKey}`).remove();
-        }
+function deleteSingleDonor(id) {
+    if (confirm(`Are you sure you want to delete Donor Record ID: ${id}?`)) {
+        let donors = JSON.parse(localStorage.getItem('umma_donors') || '[]');
+        donors = donors.filter(d => d.id !== id);
+        localStorage.setItem('umma_donors', JSON.stringify(donors));
+        renderDonors();
     }
+}
 
-    function clearAllDonors() {
-        if (confirm("WARNING: Are you sure you want to delete ALL Donor Applications?")) {
-            db.ref('umma_donors').remove();
-        }
+function clearAllDonors() {
+    if (confirm("WARNING: Are you sure you want to delete ALL Donor Applications?")) {
+        localStorage.removeItem('umma_donors');
+        renderDonors();
     }
+}
 
-    document.addEventListener('DOMContentLoaded', () => {
-        renderOrders();
-    });
+document.addEventListener('DOMContentLoaded', () => {
+    renderOrders();
+});
 </script>
 
 </body>
