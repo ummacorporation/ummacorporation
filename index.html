@@ -8,6 +8,11 @@
     <link rel="icon" type="image/png" href="Logo.png">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
+    <!-- Firebase App SDK (compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <!-- Firebase Firestore SDK (compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
     <style>
         * {
             box-sizing: border-box;
@@ -566,7 +571,6 @@
             <div class="grab-field"><label>Full Name</label><input type="text" id="orderCustName" placeholder="Enter full name" required></div>
             <div class="grab-field"><label>Phone Number</label><input type="tel" id="orderCustPhone" placeholder="09XXXXXXXXX" required></div>
             
-            <!-- DROPDOWN MENU PARA SA PRIORITY LEVEL -->
             <div class="grab-field">
                 <label>Patient Priority Level (Dropdown Menu)</label>
                 <select id="patientPriority" required>
@@ -612,6 +616,20 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
+// Firebase Configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyDFcVKUXi7S0KbIwLAHd9icy502SxIcu4",
+    authDomain: "umma-milk-system-7bb00.firebaseapp.com",
+    projectId: "umma-milk-system-7bb00",
+    storageBucket: "umma-milk-system-7bb00.firebasestorage.app",
+    messagingSenderId: "223191939316",
+    appId: "1:223191939316:web:20b44a7998019c557006a1",
+    measurementId: "G-KXQ57FXQ9E"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
 const productDatabase = {
     colostrum: [
         { name: "Premium Newborn Colostrum Kit", shop: "UMMA Central Hub Clinic", rating: 5.0, reviews: 42, image: "https://images.squarespace-cdn.com/content/v1/5c65a4e0b91449610be76a7f/1613167703016-BXM6O2VWRUOO3CVLNC9O/brick+storage.png", description: "Concentrated early-stage liquid amber fluid containing high concentrations of targeted maternal antibodies.", unit: "Syringes" }
@@ -786,7 +804,7 @@ function closeReceiptModal() {
     document.getElementById('receiptModal').style.display = 'none';
 }
 
-function submitOrder(e) {
+async function submitOrder(e) {
     e.preventDefault();
     const name = document.getElementById('orderCustName').value;
     const phone = document.getElementById('orderCustPhone').value;
@@ -803,23 +821,26 @@ function submitOrder(e) {
         address: address,
         quantity: `${qty} ${currentSelectedProductInfo.unit}`,
         productName: currentSelectedProductInfo.name,
-        status: 'Order Received'
+        status: 'Order Received',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
     };
 
-    let orders = JSON.parse(localStorage.getItem('umma_orders') || '[]');
-    orders.push(newOrder);
-    localStorage.setItem('umma_orders', JSON.stringify(orders));
+    try {
+        await db.collection("orders").doc(orderId).set(newOrder);
 
-    dismissActiveDrawer();
+        dismissActiveDrawer();
 
-    document.getElementById('receiptTrackingId').innerText = orderId;
-    document.getElementById('receiptItemName').innerText = `${currentSelectedProductInfo.name} (${qty} ${currentSelectedProductInfo.unit}) - [${priority}]`;
-    document.getElementById('receiptCustomerName').innerText = `Name: ${name} | Phone: ${phone}`;
-    document.getElementById('receiptAddress').innerText = `Delivery Address: ${address}`;
-    document.getElementById('receiptModal').style.display = 'flex';
+        document.getElementById('receiptTrackingId').innerText = orderId;
+        document.getElementById('receiptItemName').innerText = `${currentSelectedProductInfo.name} (${qty} ${currentSelectedProductInfo.unit}) - [${priority}]`;
+        document.getElementById('receiptCustomerName').innerText = `Name: ${name} | Phone: ${phone}`;
+        document.getElementById('receiptAddress').innerText = `Delivery Address: ${address}`;
+        document.getElementById('receiptModal').style.display = 'flex';
+    } catch (error) {
+        alert("Naay error sa pagpadala sa order: " + error.message);
+    }
 }
 
-function submitDonor(e) {
+async function submitDonor(e) {
     e.preventDefault();
     const name = document.getElementById('donorName').value;
     const phone = document.getElementById('donorPhone').value;
@@ -835,23 +856,26 @@ function submitDonor(e) {
         address: address,
         volume: `${volume} Liters`,
         exprDate: exprDate,
-        status: 'Pending Collection'
+        status: 'Pending Collection',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
     };
 
-    let donors = JSON.parse(localStorage.getItem('umma_donors') || '[]');
-    donors.push(newDonor);
-    localStorage.setItem('umma_donors', JSON.stringify(donors));
+    try {
+        await db.collection("donors").doc(donorId).set(newDonor);
 
-    dismissActiveDrawer();
+        dismissActiveDrawer();
 
-    document.getElementById('receiptTrackingId').innerText = donorId;
-    document.getElementById('receiptItemName').innerText = `Milk Donor Application (${volume} Liters)`;
-    document.getElementById('receiptCustomerName').innerText = `Donor Name: ${name} | Phone: ${phone}`;
-    document.getElementById('receiptAddress').innerText = `Pickup Address: ${address}`;
-    document.getElementById('receiptModal').style.display = 'flex';
+        document.getElementById('receiptTrackingId').innerText = donorId;
+        document.getElementById('receiptItemName').innerText = `Milk Donor Application (${volume} Liters)`;
+        document.getElementById('receiptCustomerName').innerText = `Donor Name: ${name} | Phone: ${phone}`;
+        document.getElementById('receiptAddress').innerText = `Pickup Address: ${address}`;
+        document.getElementById('receiptModal').style.display = 'flex';
+    } catch (error) {
+        alert("Naay error sa pagpadala sa donor info: " + error.message);
+    }
 }
 
-function performTracking() {
+async function performTracking() {
     const query = document.getElementById('trackInput').value.trim().toUpperCase();
     const resultContainer = document.getElementById('trackingResultContainer');
 
@@ -860,40 +884,44 @@ function performTracking() {
         return;
     }
 
-    const orders = JSON.parse(localStorage.getItem('umma_orders') || '[]');
-    const donors = JSON.parse(localStorage.getItem('umma_donors') || '[]');
+    resultContainer.innerHTML = `<p style="color: #64748B;">Nag-search sa Cloud Database...</p>`;
 
-    const foundOrder = orders.find(o => o.id.toUpperCase() === query);
-    const foundDonor = donors.find(d => d.id.toUpperCase() === query);
+    try {
+        const orderDoc = await db.collection("orders").doc(query).get();
+        if (orderDoc.exists) {
+            const foundOrder = orderDoc.data();
+            resultContainer.innerHTML = `
+                <div style="background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 12px; padding: 16px;">
+                    <h4 style="margin-top:0; color:#112A61;">📦 Customer Order Found (${foundOrder.id})</h4>
+                    <p style="margin: 6px 0;"><strong>Customer Name:</strong> ${foundOrder.customerName}</p>
+                    <p style="margin: 6px 0;"><strong>Product:</strong> ${foundOrder.productName} (${foundOrder.quantity})</p>
+                    <p style="margin: 6px 0;"><strong>Priority Level:</strong> ${foundOrder.priority || 'N/A'}</p>
+                    <p style="margin: 6px 0;"><strong>Status:</strong> <span class="status-pill status-preparing">${foundOrder.status}</span></p>
+                    <p style="margin: 6px 0;"><strong>Address:</strong> ${foundOrder.address}</p>
+                </div>
+            `;
+            return;
+        }
 
-    let htmlOutput = '';
+        const donorDoc = await db.collection("donors").doc(query).get();
+        if (donorDoc.exists) {
+            const foundDonor = donorDoc.data();
+            resultContainer.innerHTML = `
+                <div style="background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 12px; padding: 16px;">
+                    <h4 style="margin-top:0; color:#E25C80;">🥛 Milk Donor Application Found (${foundDonor.id})</h4>
+                    <p style="margin: 6px 0;"><strong>Donor Name:</strong> ${foundDonor.name}</p>
+                    <p style="margin: 6px 0;"><strong>Volume:</strong> ${foundDonor.volume} | <strong>Expression Date:</strong> ${foundDonor.exprDate}</p>
+                    <p style="margin: 6px 0;"><strong>Status:</strong> <span class="status-pill status-received">${foundDonor.status}</span></p>
+                    <p style="margin: 6px 0;"><strong>Pickup Address:</strong> ${foundDonor.address}</p>
+                </div>
+            `;
+            return;
+        }
 
-    if (foundOrder) {
-        htmlOutput = `
-            <div style="background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 12px; padding: 16px;">
-                <h4 style="margin-top:0; color:#112A61;">📦 Customer Order Found (${foundOrder.id})</h4>
-                <p style="margin: 6px 0;"><strong>Customer Name:</strong> ${foundOrder.customerName}</p>
-                <p style="margin: 6px 0;"><strong>Product:</strong> ${foundOrder.productName} (${foundOrder.quantity})</p>
-                <p style="margin: 6px 0;"><strong>Priority Level:</strong> ${foundOrder.priority || 'N/A'}</p>
-                <p style="margin: 6px 0;"><strong>Status:</strong> <span class="status-pill status-preparing">${foundOrder.status}</span></p>
-                <p style="margin: 6px 0;"><strong>Address:</strong> ${foundOrder.address}</p>
-            </div>
-        `;
-    } else if (foundDonor) {
-        htmlOutput = `
-            <div style="background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 12px; padding: 16px;">
-                <h4 style="margin-top:0; color:#E25C80;">🥛 Milk Donor Application Found (${foundDonor.id})</h4>
-                <p style="margin: 6px 0;"><strong>Donor Name:</strong> ${foundDonor.name}</p>
-                <p style="margin: 6px 0;"><strong>Volume:</strong> ${foundDonor.volume} | <strong>Expression Date:</strong> ${foundDonor.exprDate}</p>
-                <p style="margin: 6px 0;"><strong>Status:</strong> <span class="status-pill status-received">${foundDonor.status}</span></p>
-                <p style="margin: 6px 0;"><strong>Pickup Address:</strong> ${foundDonor.address}</p>
-            </div>
-        `;
-    } else {
-        htmlOutput = `<p style="color: #64748B; font-weight: 600;">Walay nakita nga record para sa ID: <strong>${query}</strong>. Palihog og susiha kon saktong nasuwat.</p>`;
+        resultContainer.innerHTML = `<p style="color: #64748B; font-weight: 600;">Walay nakita nga record sa cloud para sa ID: <strong>${query}</strong>.</p>`;
+    } catch (error) {
+        resultContainer.innerHTML = `<p style="color: #EF4444;">Error sa pagpangita: ${error.message}</p>`;
     }
-
-    resultContainer.innerHTML = htmlOutput;
 }
 </script>
 
