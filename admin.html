@@ -1,144 +1,481 @@
-<!-- ========================================== -->
-<!-- UMMA admin.html (Admin Management Portal) -->
-<!-- ========================================== -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UMMA Admin Portal</title>
-    <link rel="stylesheet" href="style.css">
+    <title>UMMA | Owner Admin Portal</title>
+    <link rel="icon" type="image/png" href="Logo.png">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        body {
+            background: radial-gradient(circle at 50% 30%, #E6F7FF 0%, #C4ECFF 70%, #B5E6FF 100%) fixed;
+            margin: 0;
+            padding: 0;
+            color: #1A365D;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #BCE3FF;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo-container { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+        }
+        .logo-graphic {
+            width: 44px;
+            height: 44px;
+            object-fit: contain;
+        }
+        .logo { 
+            font-size: 28px; 
+            font-weight: 900; 
+            color: #112A61; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            letter-spacing: -0.5px;
+        }
+        .logo .korean-divider {
+            color: #CBD5E1;
+            font-weight: 300;
+            font-size: 24px;
+        }
+        .logo .korean-text { 
+            font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+            font-size: 23px; 
+            font-weight: 800; 
+            color: #E25C80; 
+        }
+        .admin-badge {
+            background: #112A61;
+            color: #38BDF8;
+            font-size: 12px;
+            font-weight: 800;
+            padding: 6px 14px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .main-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .admin-panel-card {
+            background: #FFFFFF;
+            border-radius: 24px;
+            border: 2px solid #EAEFF5;
+            padding: 32px;
+            box-shadow: 0 12px 36px rgba(17, 42, 97, 0.08);
+        }
+
+        /* TAB CONTROLS */
+        .tab-menu {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #EAEFF5;
+            padding-bottom: 12px;
+        }
+        .tab-btn {
+            background: #EDF5FF;
+            color: #112A61;
+            border: 2px solid #BCE3FF;
+            padding: 10px 20px;
+            font-weight: 800;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .tab-btn.active {
+            background: #112A61;
+            color: #FFFFFF;
+            border-color: #112A61;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #F4F8FC;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .panel-title {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 800;
+            color: #112A61;
+        }
+
+        .refresh-btn {
+            background: #EDF5FF;
+            color: #112A61;
+            border: 2px solid #BCE3FF;
+            padding: 8px 16px;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .refresh-btn:hover { background: #D6E8FF; }
+
+        .clear-all-btn {
+            background: #EF4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background 0.2s ease;
+        }
+        .clear-all-btn:hover { background: #DC2626; }
+
+        .delete-single-btn {
+            background: #FEE2E2;
+            color: #991B1B;
+            border: 1px solid #FCA5A5;
+            padding: 6px 12px;
+            font-weight: 700;
+            font-size: 13px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: 10px;
+        }
+        .delete-single-btn:hover {
+            background: #EF4444;
+            color: white;
+            border-color: #EF4444;
+        }
+
+        .admin-card {
+            background: #FCFDFE;
+            border: 2px solid #EAEFF5;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 18px;
+            transition: all 0.2s ease;
+        }
+        .admin-card:hover { border-color: #CBD5E1; }
+
+        .admin-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #EAEFF5;
+            padding-bottom: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tracking-id {
+            background: #112A61;
+            color: #38BDF8;
+            font-family: monospace;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 800;
+            font-size: 15px;
+        }
+        .donor-id {
+            background: #E25C80;
+            color: #FFFFFF;
+            font-family: monospace;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 800;
+            font-size: 15px;
+        }
+
+        .status-select {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 2px solid #BCE3FF;
+            font-weight: 700;
+            color: #112A61;
+            background: #FFFFFF;
+            cursor: pointer;
+        }
+
+        .pickup-date-input {
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 2px solid #BCE3FF;
+            font-weight: 600;
+            color: #112A61;
+            background: #FFFFFF;
+            font-size: 13px;
+        }
+
+        .info-body {
+            font-size: 14.5px;
+            line-height: 1.6;
+            color: #4A5568;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #64748B;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar">
-            <div class="logo">UMMA Admin Dashboard</div>
-            <ul class="nav-links">
-                <li><a href="index.html">Back to Main Site</a></li>
-            </ul>
-        </nav>
-    </header>
 
-    <main class="admin-container">
-        <section>
-            <h2>Customer Orders</h2>
-            <table id="orders-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Customer</th>
-                        <th>Product</th>
-                        <th>Phone</th>
-                        <th>Address</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Dynamically populated -->
-                </tbody>
-            </table>
-        </section>
+<header>
+    <div class="logo-container">
+        <img src="Logo.png" alt="UMMA Logo" class="logo-graphic">
+        <div class="logo">
+            UMMA 
+            <div class="korean-divider">|</div> 
+            <div class="korean-text">엄마</div>
+        </div>
+    </div>
+    <div class="admin-badge">OWNER ADMIN PORTAL</div>
+</header>
 
-        <section>
-            <h2>Milk Donor Applications</h2>
-            <table id="donors-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Phone</th>
-                        <th>Volume (ml)</th>
-                        <th>Address</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Dynamically populated -->
-                </tbody>
-            </table>
-        </section>
-    </main>
+<div class="main-container">
+    <div class="admin-panel-card">
+        
+        <!-- TABS FOR NAVIGATION -->
+        <div class="tab-menu">
+            <button class="tab-btn active" id="tabOrdersBtn" onclick="switchTab('orders')">📦 Customer Orders</button>
+            <button class="tab-btn" id="tabDonorsBtn" onclick="switchTab('donors')">🥛 Milk Donors</button>
+        </div>
 
-    <script src="db.js"></script>
-    <script>
-        // Render Admin Tables on Load
-        document.addEventListener("DOMContentLoaded", () => {
-            loadAdminData();
-        });
+        <!-- SECTION 1: CUSTOMER ORDERS -->
+        <div id="ordersSection">
+            <div class="panel-header">
+                <div>
+                    <h2 class="panel-title">Customer Live Orders</h2>
+                    <span style="font-size: 13px; color: #64748B;">Update delivery status or delete single completed/invalid orders.</span>
+                </div>
+                <div>
+                    <button class="refresh-btn" onclick="renderOrders()">↻ Refresh</button>
+                    <button class="clear-all-btn" onclick="clearAllOrders()">Delete All Orders</button>
+                </div>
+            </div>
+            <div id="adminOrdersContainer"></div>
+        </div>
 
-        function loadAdminData() {
-            // Render Orders
-            const ordersTableBody = document.querySelector("#orders-table tbody");
-            ordersTableBody.innerHTML = "";
-            const orders = db.getOrders();
-            orders.forEach(order => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${order.id}</td>
-                    <td>${order.customerName}</td>
-                    <td>${order.product}</td>
-                    <td>${order.phone}</td>
-                    <td>${order.address}</td>
-                    <td>
-                        <select onchange="updateOrderStatus('${order.id}', this.value)">
-                            <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
-                            <option value="Dispatched" ${order.status === 'Dispatched' ? 'selected' : ''}>Dispatched</option>
-                            <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+        <!-- SECTION 2: MILK DONORS -->
+        <div id="donorsSection" style="display: none;">
+            <div class="panel-header">
+                <div>
+                    <h2 class="panel-title">Milk Donor Applications</h2>
+                    <span style="font-size: 13px; color: #64748B;">View registered donors, schedule collection, or update fulfillment status.</span>
+                </div>
+                <div>
+                    <button class="refresh-btn" onclick="renderDonors()">↻ Refresh</button>
+                    <button class="clear-all-btn" onclick="clearAllDonors()">Delete All Donors</button>
+                </div>
+            </div>
+            <div id="adminDonorsContainer"></div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+let currentTab = 'orders';
+
+function switchTab(tab) {
+    currentTab = tab;
+    if (tab === 'orders') {
+        document.getElementById('ordersSection').style.display = 'block';
+        document.getElementById('donorsSection').style.display = 'none';
+        document.getElementById('tabOrdersBtn').classList.add('active');
+        document.getElementById('tabDonorsBtn').classList.remove('active');
+        renderOrders();
+    } else {
+        document.getElementById('ordersSection').style.display = 'none';
+        document.getElementById('donorsSection').style.display = 'block';
+        document.getElementById('tabOrdersBtn').classList.remove('active');
+        document.getElementById('tabDonorsBtn').classList.add('active');
+        renderDonors();
+    }
+}
+
+/* CUSTOMER ORDERS LOGIC */
+function renderOrders() {
+    const container = document.getElementById('adminOrdersContainer');
+    const orders = JSON.parse(localStorage.getItem('umma_orders') || '[]');
+
+    if (orders.length === 0) {
+        container.innerHTML = `<div class="empty-state"><h3>No Customer Orders Found</h3><p>When customers place orders, they will automatically appear here.</p></div>`;
+        return;
+    }
+
+    container.innerHTML = orders.map(order => `
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <div>
+                    <span class="tracking-id">${order.id}</span>
+                    <span style="font-size: 12px; color: #64748B; margin-left: 10px;">Placed: ${order.date}</span>
+                </div>
+                <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <label style="font-size: 13px; font-weight: 700; color: #112A61;">Status:</label>
+                    <select class="status-select" onchange="updateOrderStatus('${order.id}', this.value)">
+                        <option value="Order Received" ${order.status === 'Order Received' ? 'selected' : ''}>Order Received</option>
+                        <option value="Preparing" ${order.status === 'Preparing' ? 'selected' : ''}>Preparing</option>
+                        <option value="In Transit" ${order.status === 'In Transit' ? 'selected' : ''}>In Transit</option>
+                        <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                    </select>
+                    <button class="delete-single-btn" onclick="deleteSingleOrder('${order.id}')">✕ Delete Order</button>
+                </div>
+            </div>
+            <div class="info-body">
+                <p style="margin: 4px 0;"><strong>Customer Name:</strong> ${order.customerName} | <strong>Phone:</strong> ${order.phone}</p>
+                <p style="margin: 4px 0;"><strong>Product Ordered:</strong> ${order.productName} (${order.quantity})</p>
+                <p style="margin: 4px 0;"><strong>Supplier Hub:</strong> ${order.hub}</p>
+                <p style="margin: 4px 0; color: #112A61;"><strong>Delivery Target Address:</strong> ${order.address}</p>
+            </div>
+        </div>
+    `).join('');
+}
+
+function updateOrderStatus(id, newStatus) {
+    let orders = JSON.parse(localStorage.getItem('umma_orders') || '[]');
+    const idx = orders.findIndex(o => o.id === id);
+    if (idx !== -1) {
+        orders[idx].status = newStatus;
+        localStorage.setItem('umma_orders', JSON.stringify(orders));
+        renderOrders();
+    }
+}
+
+function deleteSingleOrder(id) {
+    if (confirm(`Are you sure you want to delete Order ID: ${id}?`)) {
+        let orders = JSON.parse(localStorage.getItem('umma_orders') || '[]');
+        orders = orders.filter(o => o.id !== id);
+        localStorage.setItem('umma_orders', JSON.stringify(orders));
+        renderOrders();
+    }
+}
+
+function clearAllOrders() {
+    if (confirm("WARNING: Are you sure you want to delete ALL Customer Orders?")) {
+        localStorage.removeItem('umma_orders');
+        renderOrders();
+    }
+}
+
+/* MILK DONORS LOGIC */
+function renderDonors() {
+    const container = document.getElementById('adminDonorsContainer');
+    const donors = JSON.parse(localStorage.getItem('umma_donors') || '[]');
+
+    if (donors.length === 0) {
+        container.innerHTML = `<div class="empty-state"><h3>No Donor Applications Found</h3><p>When mothers apply via "Be a Milk Donor", their details will show up here.</p></div>`;
+        return;
+    }
+
+    container.innerHTML = donors.map(donor => {
+        const isScheduled = donor.status && donor.status.startsWith('Scheduled');
+        const baseStatus = isScheduled ? 'Scheduled Pickup' : (donor.status || 'Pending Collection');
+        
+        return `
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <div>
+                        <span class="donor-id">${donor.id}</span>
+                        <span style="font-size: 12px; color: #64748B; margin-left: 10px;">Applied: ${donor.date}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <label style="font-size: 13px; font-weight: 700; color: #112A61;">Donor Status:</label>
+                        <select class="status-select" onchange="updateDonorStatus('${donor.id}', this.value, this)">
+                            <option value="Pending Collection" ${baseStatus === 'Pending Collection' ? 'selected' : ''}>Pending Collection</option>
+                            <option value="Scheduled Pickup" ${baseStatus === 'Scheduled Pickup' ? 'selected' : ''}>Scheduled Pickup</option>
+                            <option value="Collected" ${baseStatus === 'Collected' ? 'selected' : ''}>Collected</option>
                         </select>
-                    </td>
-                    <td><button onclick="removeOrder('${order.id}')">Delete</button></td>
-                `;
-                ordersTableBody.appendChild(row);
-            });
+                        
+                        <input type="datetime-local" class="pickup-date-input" value="${donor.pickupDate || ''}" style="display: ${baseStatus === 'Scheduled Pickup' ? 'inline-block' : 'none'};" onchange="updatePickupDate('${donor.id}', this.value)">
 
-            // Render Donors
-            const donorsTableBody = document.querySelector("#donors-table tbody");
-            donorsTableBody.innerHTML = "";
-            const donors = db.getDonors();
-            donors.forEach(donor => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${donor.id}</td>
-                    <td>${donor.name}</td>
-                    <td>${donor.phone}</td>
-                    <td>${donor.volume}</td>
-                    <td>${donor.address}</td>
-                    <td>
-                        <select onchange="updateDonorStatus('${donor.id}', this.value)">
-                            <option value="Under Review" ${donor.status === 'Under Review' ? 'selected' : ''}>Under Review</option>
-                            <option value="Approved" ${donor.status === 'Approved' ? 'selected' : ''}>Approved</option>
-                            <option value="Collected" ${donor.status === 'Collected' ? 'selected' : ''}>Collected</option>
-                        </select>
-                    </td>
-                    <td><button onclick="removeDonor('${donor.id}')">Delete</button></td>
-                `;
-                donorsTableBody.appendChild(row);
-            });
-        }
+                        <button class="delete-single-btn" onclick="deleteSingleDonor('${donor.id}')">✕ Delete Donor</button>
+                    </div>
+                </div>
+                <div class="info-body">
+                    <p style="margin: 4px 0;"><strong>Donor Name:</strong> ${donor.name} | <strong>Phone:</strong> ${donor.phone}</p>
+                    <p style="margin: 4px 0;"><strong>Estimated Volume:</strong> ${donor.volume} | <strong>Expression Date:</strong> ${donor.exprDate}</p>
+                    <p style="margin: 4px 0; color: #112A61;"><strong>Pickup Address:</strong> ${donor.address}</p>
+                    ${isScheduled ? `<p style="margin: 4px 0; color: #E25C80; font-weight: 700;">Scheduled Pickup Date & Time: ${donor.pickupDate ? new Date(donor.pickupDate).toLocaleString() : 'Not set'}</p>` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
 
-        function updateOrderStatus(id, status) {
-            db.updateOrderStatus(id, status);
-        }
+function updateDonorStatus(id, newStatus, selectElement) {
+    let donors = JSON.parse(localStorage.getItem('umma_donors') || '[]');
+    const idx = donors.findIndex(d => d.id === id);
+    const dateInput = selectElement.parentElement.querySelector('.pickup-date-input');
 
-        function updateDonorStatus(id, status) {
-            db.updateDonorStatus(id, status);
+    if (idx !== -1) {
+        if (newStatus === 'Scheduled Pickup') {
+            dateInput.style.display = 'inline-block';
+            donors[idx].status = `Scheduled: ${dateInput.value || 'Not set'}`;
+        } else {
+            dateInput.style.display = 'none';
+            donors[idx].status = newStatus;
+            donors[idx].pickupDate = '';
         }
+        localStorage.setItem('umma_donors', JSON.stringify(donors));
+        renderDonors();
+    }
+}
 
-        function removeOrder(id) {
-            if (confirm("Are you sure you want to delete this order?")) {
-                db.deleteOrder(id);
-                loadAdminData();
-            }
-        }
+function updatePickupDate(id, dateTimeVal) {
+    let donors = JSON.parse(localStorage.getItem('umma_donors') || '[]');
+    const idx = donors.findIndex(d => d.id === id);
+    if (idx !== -1) {
+        donors[idx].pickupDate = dateTimeVal;
+        donors[idx].status = `Scheduled: ${dateTimeVal}`;
+        localStorage.setItem('umma_donors', JSON.stringify(donors));
+        renderDonors();
+    }
+}
 
-        function removeDonor(id) {
-            if (confirm("Are you sure you want to delete this donor application?")) {
-                db.deleteDonor(id);
-                loadAdminData();
-            }
-        }
-    </script>
+function deleteSingleDonor(id) {
+    if (confirm(`Are you sure you want to delete Donor Record ID: ${id}?`)) {
+        let donors = JSON.parse(localStorage.getItem('umma_donors') || '[]');
+        donors = donors.filter(d => d.id !== id);
+        localStorage.setItem('umma_donors', JSON.stringify(donors));
+        renderDonors();
+    }
+}
+
+function clearAllDonors() {
+    if (confirm("WARNING: Are you sure you want to delete ALL Donor Applications?")) {
+        localStorage.removeItem('umma_donors');
+        renderDonors();
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    renderOrders();
+});
+</script>
+
 </body>
 </html>
