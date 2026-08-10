@@ -1,3 +1,7 @@
+<!-- ================================================================================= -->
+<!-- UPDATED UMMA index.html: Parent-to-Parent Listings, Real Donor/Seller Profiles, -->
+<!-- Chat Bubbles, and Pricing/FREE indicators reflecting the whiteboard wireframe.    -->
+<!-- ================================================================================= -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -314,12 +318,13 @@
         .products-popup { 
             background: #FFFFFF; 
             width: 95%; 
-            max-width: 700px; 
+            max-width: 740px; 
             border-radius: 24px; 
             display: flex; 
             flex-direction: column; 
             overflow: hidden;
             animation: modalSlideUp 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            box-shadow: 0 20px 40px rgba(17, 42, 97, 0.2);
         }
         @keyframes modalSlideUp {
             from { transform: translateY(20px); opacity: 0; }
@@ -327,24 +332,105 @@
         }
         .popup-header { padding: 22px; background: #F4F8FC; border-bottom: 1px solid #EAEFF5; display: flex; justify-content: space-between; align-items: center; }
         .popup-title { margin: 0; font-size: 20px; font-weight: 800; color: #112A61; }
-        .popup-body { padding: 26px; max-height: 60vh; overflow-y: auto; }
+        .popup-body { padding: 26px; max-height: 65vh; overflow-y: auto; }
         .close-popup, .close-drawer { font-size: 22px; cursor: pointer; color: #8A9AAD; transition: color 0.2s ease; }
         .close-popup:hover, .close-drawer:hover { color: #E25C80; }
 
-        .shop-product-item { border: 1px solid #EAEFF5; border-radius: 18px; padding: 20px; margin-bottom: 15px; transition: border-color 0.3s ease; }
-        .shop-product-item:hover { border-color: #CBD5E1; }
-        .product-meta-block { display: flex; align-items: flex-start; gap: 20px; width: 100%; }
-        .product-thumbnail-frame { width: 100px; height: 100px; border-radius: 12px; object-fit: cover; flex-shrink: 0; }
-        .shop-info-row { display: flex; justify-content: space-between; align-items: flex-start; flex: 1; width: 100%; }
-        .shop-details { display: flex; flex-direction: column; gap: 6px; }
-        .shop-details h4 { margin: 0; font-size: 18px; color: #112A61; line-height: 1.3; }
-        .shop-details p { margin: 0; font-size: 14px; color: #4A5568; }
-        .source-shop { font-weight: 700; color: #E25C80; }
-        .product-caption-desc { color: #718096 !important; font-size: 14px; margin-top: 4px !important; }
+        /* Whiteboard Wireframe Styled Listing Cards */
+        .whiteboard-listing-card {
+            background: #FFFFFF;
+            border: 2px solid #EAEFF5;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            box-shadow: 0 4px 12px rgba(17, 42, 97, 0.03);
+        }
+        .whiteboard-listing-card:hover {
+            border-color: #CBD5E1;
+            box-shadow: 0 8px 24px rgba(17, 42, 97, 0.08);
+            transform: translateY(-2px);
+        }
 
-        .rating-container { display: flex; flex-direction: column; align-items: flex-end; min-width: 70px; text-align: right; }
-        .star-badge { font-weight: 700; color: #D48806; font-size: 15px; }
-        .review-count { font-size: 13px; color: #718096; margin-top: 2px; }
+        .listing-img-box {
+            width: 100px;
+            height: 100px;
+            border-radius: 16px;
+            object-fit: cover;
+            border: 2px solid #E2E8F0;
+            flex-shrink: 0;
+            background: #F8FAFC;
+        }
+
+        .listing-info-box {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .listing-parent-name {
+            font-size: 20px;
+            font-weight: 800;
+            color: #112A61;
+            margin: 0;
+            letter-spacing: -0.3px;
+        }
+
+        .listing-price-badge {
+            font-size: 18px;
+            font-weight: 900;
+            display: inline-block;
+        }
+        .listing-price-badge.free {
+            color: #137333;
+            background: #E6F4EA;
+            padding: 3px 10px;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+        .listing-price-badge.paid {
+            color: #E25C80;
+        }
+
+        .listing-details-snippet {
+            font-size: 13.5px;
+            color: #64748B;
+            margin: 0;
+        }
+
+        .chat-action-btn {
+            background: #EDF5FF;
+            border: 2px solid #BCE3FF;
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
+        }
+        .chat-action-btn:hover {
+            background: #4A90E2;
+            border-color: #4A90E2;
+            transform: scale(1.08);
+        }
+        .chat-action-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: #4A90E2;
+            transition: fill 0.3s ease;
+        }
+        .chat-action-btn:hover svg {
+            fill: #FFFFFF;
+        }
 
         .action-buttons-row { display: flex; justify-content: flex-end; gap: 10px; margin-top: 12px; border-top: 1px dashed #EAEFF5; padding-top: 12px; }
         .order-btn { background: #E25C80; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; }
@@ -422,9 +508,8 @@
             .directory-map-graphic { min-width: 100%; }
             .map-frame-outer { min-height: 320px; }
             .form-map-container { height: 220px; min-height: 220px; }
-            .product-meta-block { flex-direction: column; align-items: center; text-align: center; }
-            .shop-info-row { flex-direction: column; align-items: center; gap: 10px; }
-            .rating-container { align-items: center; text-align: center; }
+            .whiteboard-listing-card { flex-direction: column; align-items: flex-start; }
+            .chat-action-btn { align-self: flex-end; }
             .grab-side-drawer { width: 100%; right: -100%; }
             .hero-logo-frame { max-width: 280px; }
         }
@@ -471,25 +556,25 @@
 <main class="main-content">
     <div class="main-content-wrapper">
         <div class="section-title">Explore Milk Products</div>
-        <div class="section-subtitle">Click a card to see available products, verified suppliers, ratings, and order parameters.</div>
+        <div class="section-subtitle">Click a category card to see local parents who share or sell their expressed milk batches, complete with direct chat and order options.</div>
         
         <div class="cards-grid">
             <div class="category-card colostrum" onclick="showProducts('colostrum')">
                 <h3 class="category-name">Colostrum Care Packs</h3>
-                <p class="category-desc">Early-stage fluid packed with ultra-high antibody levels and immunoglobulins. Essential for premature or newborn infant recovery.</p>
-                <span class="view-products-text" style="color:#D48806;">View Products & Shops →</span>
+                <p class="category-desc">Early-stage fluid packed with ultra-high antibody levels and immunoglobulins. Essential for premature or newborn infant recovery. <strong>(For babies below 1 month old)</strong></p>
+                <span class="view-products-text" style="color:#D48806;">View Parent Listings →</span>
             </div>
 
             <div class="category-card transitional" onclick="showProducts('transitional')">
                 <h3 class="category-name">Transitional Milk</h3>
-                <p class="category-desc">Sourced from days 5–14 postpartum. A dynamic nutritional bridge featuring surging levels of healthy fats, calories, and lactose.</p>
-                <span class="view-products-text" style="color:#4A90E2;">View Products & Shops →</span>
+                <p class="category-desc">Sourced from days 5–14 postpartum. A dynamic nutritional bridge featuring surging levels of healthy fats, calories, and lactose. <strong>(For infants aged 2–5 months)</strong></p>
+                <span class="view-products-text" style="color:#4A90E2;">View Parent Listings →</span>
             </div>
 
             <div class="category-card mature" onclick="showProducts('mature')">
                 <h3 class="category-name">Mature Milk Batches</h3>
-                <p class="category-desc">Stabilized long-term support breast milk collected past day 15. Formulated perfectly for sustained growth, volume, and hydration.</p>
-                <span class="view-products-text" style="color:#E25C80;">View Products & Shops →</span>
+                <p class="category-desc">Stabilized long-term support breast milk collected past day 15. Formulated perfectly for sustained growth, volume, and hydration. <strong>(For infants aged 8 months and higher)</strong></p>
+                <span class="view-products-text" style="color:#E25C80;">View Parent Listings →</span>
             </div>
         </div>
 
@@ -525,10 +610,30 @@
 <div class="modal-overlay" id="productsModal">
     <div class="products-popup">
         <div class="popup-header">
-            <h3 class="popup-title" id="modalTitle">Available Products</h3>
+            <h3 class="popup-title" id="modalTitle">Parent Listings</h3>
             <span class="close-popup" onclick="closePopup()">&times;</span>
         </div>
         <div class="popup-body" id="modalProductList"></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="chatModal">
+    <div class="products-popup" style="max-width: 500px;">
+        <div class="popup-header">
+            <h3 class="popup-title" id="chatModalTitle">Chat with Parent</h3>
+            <span class="close-popup" onclick="closeChatModal()">&times;</span>
+        </div>
+        <div class="popup-body" style="background: #F8FAFC;">
+            <div id="chatMessages" style="height: 250px; overflow-y: auto; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
+                <div style="background: #EDF5FF; padding: 10px 14px; border-radius: 12px; max-width: 80%; align-self: flex-start; font-size: 14px; color: #112A61;">
+                    Hello! I'm interested in your milk batch. Is it still available for pickup or delivery?
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="chatInputBox" placeholder="Type your message here..." style="flex: 1; padding: 12px; border: 2px solid #E2E8F0; border-radius: 8px; font-size: 14px;" onkeypress="if(event.key === 'Enter') sendChatMessage();">
+                <button class="order-btn" onclick="sendChatMessage()" style="padding: 0 20px;">Send</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -597,7 +702,7 @@
                 <input type="number" id="orderQuantityInput" min="1" step="1" value="1" required>
             </div>
             
-            <div class="grab-field"><label>Selected Product</label><textarea id="checkoutProductDetails" rows="3" readonly style="background-color: #F4F8FC; border-color: #EAEFF5; cursor: not-allowed;"></textarea></div>
+            <div class="grab-field"><label>Selected Listing / Parent Provider</label><textarea id="checkoutProductDetails" rows="3" readonly style="background-color: #F4F8FC; border-color: #EAEFF5; cursor: not-allowed;"></textarea></div>
         </form>
     </div>
     <div class="drawer-footer"><button type="submit" form="ummaReceiverForm" class="grab-submit-btn">Confirm Order Request</button></div>
@@ -620,15 +725,62 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-const productDatabase = {
+/* Updated database mirroring the whiteboard layout (Parent Name, Image, Price/FREE status, and Chat trigger) */
+const parentListingsDatabase = {
     colostrum: [
-        { name: "Premium Newborn Colostrum Kit", shop: "UMMA Central Hub Clinic", rating: 5.0, reviews: 42, image: "https://images.squarespace-cdn.com/content/v1/5c65a4e0b91449610be76a7f/1613167703016-BXM6O2VWRUOO3CVLNC9O/brick+storage.png", description: "Concentrated early-stage liquid amber fluid containing high concentrations of targeted maternal antibodies.", unit: "Syringes" }
+        { 
+            parentName: "Maria", 
+            priceText: "FREE", 
+            isFree: true, 
+            image: "https://images.squarespace-cdn.com/content/v1/5c65a4e0b91449610be76a7f/1613167703016-BXM6O2VWRUOO3CVLNC9O/brick+storage.png", 
+            description: "Freshly expressed colostrum syringes packed with high antibodies. Sterilized & frozen storage." 
+        },
+        { 
+            parentName: "Carmen", 
+            priceText: "₱150", 
+            isFree: false, 
+            image: "https://images.squarespace-cdn.com/content/v1/5c65a4e0b91449610be76a7f/1613167703016-BXM6O2VWRUOO3CVLNC9O/brick+storage.png", 
+            description: "Newborn colostrum care pack, vacuum-sealed storage brick." 
+        },
+        { 
+            parentName: "Lourdes", 
+            priceText: "₱200", 
+            isFree: false, 
+            image: "https://images.squarespace-cdn.com/content/v1/5c65a4e0b91449610be76a7f/1613167703016-BXM6O2VWRUOO3CVLNC9O/brick+storage.png", 
+            description: "Early golden milk colostrum batch, rigorously tested." 
+        }
     ],
     transitional: [
-        { name: "Bridge Nutrient Transitional Pack (300ml)", shop: "UMMA Central Hub Clinic", rating: 4.8, reviews: 89, image: "https://images.squarespace-cdn.com/content/v1/5c65a4e0b91449610be76a7f/1613167703016-BXM6O2VWRUOO3CVLNC9O/brick+storage.png", description: "Mid-stage transitional breast milk high in raw fat content and caloric density.", unit: "Pouches" }
+        { 
+            parentName: "Sarah", 
+            priceText: "FREE", 
+            isFree: true, 
+            image: "https://images.squarespace-cdn.com/content/v1/5c65a4e0b91449610be76a7f/1613167703016-BXM6O2VWRUOO3CVLNC9O/brick+storage.png", 
+            description: "Day 8 transitional milk pouch. High calorie & lactose for 2-month infant." 
+        },
+        { 
+            parentName: "Bea", 
+            priceText: "₱180", 
+            isFree: false, 
+            image: "https://images.squarespace-cdn.com/content/v1/5c65a4e0b91449610be76a7f/1613167703016-BXM6O2VWRUOO3CVLNC9O/brick+storage.png", 
+            description: "Nutritional bridge transitional milk batch (300ml)." 
+        }
     ],
     mature: [
-        { name: "Sustained-Growth Mature Milk Bag", shop: "UMMA Central Hub Clinic", rating: 4.9, reviews: 156, image: "https://images.squarespace-cdn.com/content/v1/5c65a4e0b91449610be76a7f/1613167703016-BXM6O2VWRUOO3CVLNC9O/brick+storage.png", description: "Completely screened, balanced long-term mature formulation for healthy infants over two weeks old.", unit: "Liters" }
+        { 
+            parentName: "Elena", 
+            priceText: "FREE", 
+            isFree: true, 
+            image: "https://images.squarespace-cdn.com/content/v1/5c65a4e0b91449610be76a7f/1613167703016-BXM6O2VWRUOO3CVLNC9O/brick+storage.png", 
+            description: "Mature milk batch for sustained growth, 8+ months old infant." 
+        },
+        { 
+            parentName: "Teresa", 
+            priceText: "₱250", 
+            isFree: false, 
+            image: "https://images.squarespace-cdn.com/content/v1/5c65a4e0b91449610be76a7f/1613167703016-BXM6O2VWRUOO3CVLNC9O/brick+storage.png", 
+            description: "Bulk mature milk storage bottles (1 Liter total)." 
+        }
     ]
 };
 
@@ -724,33 +876,31 @@ function showProducts(category) {
     const modalTitle = document.getElementById('modalTitle');
     listContainer.innerHTML = '';
 
-    const titleMap = { colostrum: "Colostrum Care Packs", transitional: "Transitional Milk Options", mature: "Mature Milk Batches" };
-    modalTitle.innerText = titleMap[category] || "Available Products";
+    const titleMap = { colostrum: "Colostrum Care Packs - Parent Listings", transitional: "Transitional Milk - Parent Listings", mature: "Mature Milk Batches - Parent Listings" };
+    modalTitle.innerText = titleMap[category] || "Parent Listings";
 
-    const items = productDatabase[category] || [];
-    items.forEach(prod => {
-        const itemHtml = `
-            <div class="shop-product-item">
-                <div class="product-meta-block">
-                    <img src="${prod.image}" alt="${prod.name}" class="product-thumbnail-frame">
-                    <div class="shop-info-row">
-                        <div class="shop-details">
-                            <h4>${prod.name}</h4>
-                            <p class="source-shop">Supplier: ${prod.shop}</p>
-                            <p class="product-caption-desc">${prod.description}</p>
-                        </div>
-                        <div class="rating-container">
-                            <span class="star-badge">★ ${prod.rating}</span>
-                            <span class="review-count">(${prod.reviews} reviews)</span>
-                        </div>
+    const listings = parentListingsDatabase[category] || [];
+    listings.forEach(item => {
+        const priceClass = item.isFree ? 'free' : 'paid';
+        const cardHtml = `
+            <div class="whiteboard-listing-card">
+                <img src="${item.image}" alt="${item.parentName}'s milk listing" class="listing-img-box">
+                <div class="listing-info-box">
+                    <h4 class="listing-parent-name">${item.parentName}</h4>
+                    <span class="listing-price-badge ${priceClass}">${item.priceText}</span>
+                    <p class="listing-details-snippet">${item.description}</p>
+                    <div style="margin-top: 8px;">
+                        <button class="order-btn" onclick="openOrderDrawer('${item.description}', '${item.parentName}', 'Units')">Request from ${item.parentName}</button>
                     </div>
                 </div>
-                <div class="action-buttons-row">
-                    <button class="order-btn" onclick="openOrderDrawer('${prod.name}', '${prod.shop}', '${prod.unit}')">Request Order</button>
+                <div class="chat-action-btn" title="Chat with ${item.parentName}" onclick="openChatModal('${item.parentName}')">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+                    </svg>
                 </div>
             </div>
         `;
-        listContainer.innerHTML += itemHtml;
+        listContainer.innerHTML += cardHtml;
     });
 
     document.getElementById('productsModal').style.display = 'flex';
@@ -760,10 +910,42 @@ function closePopup() {
     document.getElementById('productsModal').style.display = 'none';
 }
 
+function openChatModal(parentName) {
+    document.getElementById('chatModalTitle').innerText = `Chat with ${parentName}`;
+    document.getElementById('chatModal').style.display = 'flex';
+}
+
+function closeChatModal() {
+    document.getElementById('chatModal').style.display = 'none';
+}
+
+function sendChatMessage() {
+    const input = document.getElementById('chatInputBox');
+    const text = input.value.trim();
+    if (!text) return;
+
+    const chatMessages = document.getElementById('chatMessages');
+    const userMsgDiv = document.createElement('div');
+    userMsgDiv.style.cssText = "background: #E25C80; color: #FFFFFF; padding: 10px 14px; border-radius: 12px; max-width: 80%; align-self: flex-end; font-size: 14px;";
+    userMsgDiv.innerText = text;
+    chatMessages.appendChild(userMsgDiv);
+
+    input.value = '';
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    setTimeout(() => {
+        const replyDiv = document.createElement('div');
+        replyDiv.style.cssText = "background: #EDF5FF; padding: 10px 14px; border-radius: 12px; max-width: 80%; align-self: flex-start; font-size: 14px; color: #112A61;";
+        replyDiv.innerText = "Salamat sa mensahe! Safe ug malinis ang akong storage. Pwede nato i-arrange ang pick-up o delivery.";
+        chatMessages.appendChild(replyDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }, 1000);
+}
+
 function openOrderDrawer(productName, shopName, unitName) {
     closePopup();
     currentSelectedProductInfo = { name: productName, shop: shopName, unit: unitName };
-    document.getElementById('checkoutProductDetails').value = `${productName}\nSupplier: ${shopName}`;
+    document.getElementById('checkoutProductDetails').value = `${productName}\nParent Donor/Seller: ${shopName}`;
     document.getElementById('quantityFieldLabel').innerText = `Quantity (${unitName})`;
     
     document.getElementById('drawerOverlay').style.display = 'block';
@@ -772,14 +954,20 @@ function openOrderDrawer(productName, shopName, unitName) {
 }
 
 function openDonorDrawer() {
+    dismissActiveDrawer();
     document.getElementById('drawerOverlay').style.display = 'block';
     document.getElementById('donorDrawer').classList.add('open');
 }
 
 function dismissActiveDrawer() {
-    document.getElementById('drawerOverlay').style.display = 'none';
-    document.getElementById('receiverDrawer').classList.remove('open');
-    document.getElementById('donorDrawer').classList.remove('open');
+    var drawers = document.querySelectorAll('.grab-side-drawer');
+    drawers.forEach(function(drawer) {
+        drawer.classList.remove('open');
+    });
+    var overlay = document.getElementById('drawerOverlay');
+    if (overlay) {
+        overlay.style.display = 'none';
+    }
 }
 
 function openTrackModal() {
@@ -901,18 +1089,9 @@ function performTracking() {
     resultContainer.innerHTML = htmlOutput;
 }
 
-// Google Sign-In Response Handler & JWT Decoder
 function handleCredentialResponse(response) {
     const responsePayload = decodeJwtResponse(response.credential);
-    
-    console.log("ID: " + responsePayload.sub);
-    console.log("Full Name: " + responsePayload.name);
-    console.log("Email: " + responsePayload.email);
-    console.log("Profile Picture: " + responsePayload.picture);
-
     alert("Welcome, " + responsePayload.name + "! Successfully logged in.");
-    
-    // TODO: Store user session or redirect them to their dashboard
 }
 
 function decodeJwtResponse(token) {
