@@ -1,142 +1,115 @@
+<!-- ========================================== -->
+<!-- UMMA index.html (Frontend & Form Handling) -->
+<!-- ========================================== -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UMMA | Fresh Breastmilk Delivery & Donor Portal</title>
-    <link rel="icon" type="image/png" href="Logo.png">
+    <title>UMMA - United Mothers for Milk Association</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Leaflet CSS for Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">UMMA (엄마)</div>
+            <ul class="nav-links">
+                <li><a href="#products">Products</a></li>
+                <li><a href="#hubs">Supply Hubs</a></li>
+                <li><a href="#donor">Become a Donor</a></li>
+                <li><a href="admin.html" target="_blank">Admin Portal</a></li>
+            </ul>
+        </nav>
+    </header>
 
-<header>
-    <div class="logo">UMMA <span style="color:#CBD5E1">|</span> <span class="korean-text">엄마</span></div>
-    <a href="admin.html" style="font-weight: 700; color: #112A61; text-decoration: none;">Admin Portal →</a>
-</header>
+    <main>
+        <section id="hero">
+            <h1>Nourishing the Future, Together</h1>
+            <p>Explore verified milk product batches, track orders, or register as a donor.</p>
+        </section>
 
-<div class="main-container">
-    <!-- ORDER FORM -->
-    <div class="card">
-        <h2>📦 Order Fresh Breastmilk</h2>
-        <div class="form-group">
-            <label>Customer Name</label>
-            <input type="text" id="orderName" placeholder="Enter your full name">
+        <!-- Products Section -->
+        <section id="products">
+            <h2>Milk Product Batches</h2>
+            <div class="product-grid">
+                <div class="product-card">
+                    <h3>Colostrum Care Pack</h3>
+                    <p>Rich in antibodies and essential nutrients for newborns.</p>
+                    <button onclick="openOrderModal('Colostrum Care Pack')">Order Now</button>
+                </div>
+                <div class="product-card">
+                    <h3>Transitional Milk</h3>
+                    <p>Balanced nutrition tailored for growing infants.</p>
+                    <button onclick="openOrderModal('Transitional Milk')">Order Now</button>
+                </div>
+                <div class="product-card">
+                    <h3>Mature Milk Batch</h3>
+                    <p>High quality tested and verified mature milk supplies.</p>
+                    <button onclick="openOrderModal('Mature Milk Batch')">Order Now</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Supply Hubs Map Section -->
+        <section id="hubs">
+            <h2>UMMA Central Hub & Supply Directory</h2>
+            <div id="map" style="height: 400px; width: 100%;"></div>
+        </section>
+
+        <!-- Donor Registration Section -->
+        <section id="donor">
+            <h2>Milk Donor Registration</h2>
+            <form id="donor-form" onsubmit="handleDonorSubmit(event)">
+                <div class="form-group">
+                    <label for="donor-name">Full Name:</label>
+                    <input type="text" id="donor-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="donor-phone">Phone Number:</label>
+                    <input type="tel" id="donor-phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="donor-volume">Estimated Volume (ml):</label>
+                    <input type="number" id="donor-volume" required>
+                </div>
+                <div class="form-group">
+                    <label for="donor-address">Pickup Address:</label>
+                    <input type="text" id="donor-address" required>
+                </div>
+                <button type="submit">Submit Donor Application</button>
+            </form>
+        </section>
+    </main>
+
+    <!-- Order Modal -->
+    <div id="order-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeOrderModal()">&times;</span>
+            <h2>Place Order</h2>
+            <form id="order-form" onsubmit="handleOrderSubmit(event)">
+                <input type="hidden" id="order-product">
+                <div class="form-group">
+                    <label for="customer-name">Your Name:</label>
+                    <input type="text" id="customer-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="customer-phone">Phone Number:</label>
+                    <input type="tel" id="customer-phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="delivery-address">Delivery Address:</label>
+                    <textarea id="delivery-address" required></textarea>
+                </div>
+                <button type="submit">Confirm Order</button>
+            </form>
         </div>
-        <div class="form-group">
-            <label>Phone Number</label>
-            <input type="text" id="orderPhone" placeholder="09123456789">
-        </div>
-        <div class="form-group">
-            <label>Quantity</label>
-            <select id="orderQty">
-                <option value="1 Bottle">1 Bottle</option>
-                <option value="2 Bottles">2 Bottles</option>
-                <option value="5 Bottles">5 Bottles</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Delivery Address</label>
-            <textarea id="orderAddress" placeholder="Complete delivery address"></textarea>
-        </div>
-        <button class="submit-btn" onclick="submitOrder()">Submit Order</button>
     </div>
 
-    <!-- DONOR FORM -->
-    <div class="card">
-        <h2>🥛 Be a Milk Donor</h2>
-        <div class="form-group">
-            <label>Donor Name</label>
-            <input type="text" id="donorName" placeholder="Enter your full name">
-        </div>
-        <div class="form-group">
-            <label>Phone Number</label>
-            <input type="text" id="donorPhone" placeholder="09123456789">
-        </div>
-        <div class="form-group">
-            <label>Estimated Volume (oz / ml)</label>
-            <input type="text" id="donorVolume" placeholder="e.g., 100ml">
-        </div>
-        <div class="form-group">
-            <label>Expression Date</label>
-            <input type="date" id="donorExprDate">
-        </div>
-        <div class="form-group">
-            <label>Pickup Address</label>
-            <textarea id="donorAddress" placeholder="Complete address for milk pickup"></textarea>
-        </div>
-        <button class="submit-btn donor-btn" onclick="submitDonor()">Submit Donor Application</button>
-    </div>
-</div>
-
-<script>
-    function submitOrder() {
-        const name = document.getElementById('orderName').value.trim();
-        const phone = document.getElementById('orderPhone').value.trim();
-        const quantity = document.getElementById('orderQty').value;
-        const address = document.getElementById('orderAddress').value.trim();
-
-        if (!name || !phone || !address) {
-            alert('Palihog puga ang tanang kinahanglanon nga impormasyon.');
-            return;
-        }
-
-        const newOrder = {
-            id: 'ORD-' + Math.floor(100000 + Math.random() * 900000),
-            date: new Date().toLocaleString(),
-            customerName: name,
-            phone: phone,
-            productName: 'UMMA Fresh Breastmilk',
-            quantity: quantity,
-            hub: 'Central Hub',
-            address: address,
-            status: 'Order Received'
-        };
-
-        let orders = JSON.parse(localStorage.getItem('umma_orders')) || [];
-        orders.push(newOrder);
-        localStorage.setItem('umma_orders', JSON.stringify(orders));
-
-        alert('Order submitted successfully!');
-        document.getElementById('orderName').value = '';
-        document.getElementById('orderPhone').value = '';
-        document.getElementById('orderAddress').value = '';
-    }
-
-    function submitDonor() {
-        const name = document.getElementById('donorName').value.trim();
-        const phone = document.getElementById('donorPhone').value.trim();
-        const volume = document.getElementById('donorVolume').value.trim();
-        const exprDate = document.getElementById('donorExprDate').value;
-        const address = document.getElementById('donorAddress').value.trim();
-
-        if (!name || !phone || !address) {
-            alert('Palihog puga ang tanang kinahanglanon nga impormasyon.');
-            return;
-        }
-
-        const newDonor = {
-            id: 'DONOR-' + Math.floor(100000 + Math.random() * 900000),
-            date: new Date().toLocaleString(),
-            name: name,
-            phone: phone,
-            volume: volume || 'N/A',
-            exprDate: exprDate || 'N/A',
-            address: address,
-            status: 'Pending Collection',
-            pickupDate: ''
-        };
-
-        let donors = JSON.parse(localStorage.getItem('umma_donors')) || [];
-        donors.push(newDonor);
-        localStorage.setItem('umma_donors', JSON.stringify(donors));
-
-        alert('Donor application submitted successfully!');
-        document.getElementById('donorName').value = '';
-        document.getElementById('donorPhone').value = '';
-        document.getElementById('donorVolume').value = '';
-        document.getElementById('donorExprDate').value = '';
-        document.getElementById('donorAddress').value = '';
-    }
-</script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="db.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
