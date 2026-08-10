@@ -15,4 +15,4 @@ function dismissActiveDrawer() {
     if (overlay) {
         overlay.style.display = 'none';
     }
-}
+}[cite: 3]
