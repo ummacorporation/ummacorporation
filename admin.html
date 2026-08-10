@@ -1,345 +1,144 @@
+<!-- ========================================== -->
+<!-- UMMA admin.html (Admin Management Portal) -->
+<!-- ========================================== -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UMMA | Owner Admin Portal</title>
-    <link rel="icon" type="image/png" href="Logo.png">
+    <title>UMMA Admin Portal</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .admin-badge {
-            background: #112A61;
-            color: #38BDF8;
-            font-size: 12px;
-            font-weight: 800;
-            padding: 6px 14px;
-            border-radius: 20px;
-        }
-        .main-container {
-            max-width: 1000px;
-        }
-        .admin-panel-card {
-            background: #FFFFFF;
-            border-radius: 24px;
-            border: 2px solid #EAEFF5;
-            padding: 32px;
-            box-shadow: 0 12px 36px rgba(17, 42, 97, 0.08);
-        }
-        .tab-menu {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
-            border-bottom: 2px solid #EAEFF5;
-            padding-bottom: 12px;
-        }
-        .tab-btn {
-            background: #EDF5FF;
-            color: #112A61;
-            border: 2px solid #BCE3FF;
-            padding: 10px 20px;
-            font-weight: 800;
-            border-radius: 12px;
-            cursor: pointer;
-        }
-        .tab-btn.active {
-            background: #112A61;
-            color: #FFFFFF;
-            border-color: #112A61;
-        }
-        .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #F4F8FC;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .panel-title {
-            margin: 0;
-            font-size: 22px;
-            font-weight: 800;
-            color: #112A61;
-        }
-        .refresh-btn {
-            background: #EDF5FF;
-            color: #112A61;
-            border: 2px solid #BCE3FF;
-            padding: 8px 16px;
-            font-weight: 700;
-            border-radius: 12px;
-            cursor: pointer;
-        }
-        .clear-all-btn {
-            background: #EF4444;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            font-weight: 700;
-            border-radius: 12px;
-            cursor: pointer;
-            margin-left: 10px;
-        }
-        .delete-single-btn {
-            background: #FEE2E2;
-            color: #991B1B;
-            border: 1px solid #FCA5A5;
-            padding: 6px 12px;
-            font-weight: 700;
-            font-size: 13px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-left: 10px;
-        }
-        .delete-single-btn:hover {
-            background: #EF4444;
-            color: white;
-        }
-        .admin-card {
-            background: #FCFDFE;
-            border: 2px solid #EAEFF5;
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 18px;
-        }
-        .admin-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #EAEFF5;
-            padding-bottom: 12px;
-            margin-bottom: 14px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .tracking-id {
-            background: #112A61;
-            color: #38BDF8;
-            font-family: monospace;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-weight: 800;
-            font-size: 15px;
-        }
-        .donor-id {
-            background: #E25C80;
-            color: #FFFFFF;
-            font-family: monospace;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-weight: 800;
-            font-size: 15px;
-        }
-        .status-select {
-            padding: 6px 12px;
-            border-radius: 8px;
-            border: 2px solid #BCE3FF;
-            font-weight: 700;
-            color: #112A61;
-            background: #FFFFFF;
-            cursor: pointer;
-        }
-        .info-body {
-            font-size: 14.5px;
-            line-height: 1.6;
-            color: #4A5568;
-        }
-        .empty-state {
-            text-align: center;
-            padding: 50px 20px;
-            color: #64748B;
-            font-weight: 600;
-        }
-    </style>
 </head>
 <body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">UMMA Admin Dashboard</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Back to Main Site</a></li>
+            </ul>
+        </nav>
+    </header>
 
-<header>
-    <div class="logo">UMMA <span style="color:#CBD5E1">|</span> <span class="korean-text">엄마</span></div>
-    <div class="admin-badge">OWNER ADMIN PORTAL</div>
-</header>
+    <main class="admin-container">
+        <section>
+            <h2>Customer Orders</h2>
+            <table id="orders-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Customer</th>
+                        <th>Product</th>
+                        <th>Phone</th>
+                        <th>Address</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dynamically populated -->
+                </tbody>
+            </table>
+        </section>
 
-<div class="main-container">
-    <div class="admin-panel-card">
-        <div class="tab-menu">
-            <button class="tab-btn active" id="tabOrdersBtn" onclick="switchTab('orders')">📦 Customer Orders</button>
-            <button class="tab-btn" id="tabDonorsBtn" onclick="switchTab('donors')">🥛 Milk Donors</button>
-        </div>
+        <section>
+            <h2>Milk Donor Applications</h2>
+            <table id="donors-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Volume (ml)</th>
+                        <th>Address</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dynamically populated -->
+                </tbody>
+            </table>
+        </section>
+    </main>
 
-        <!-- SECTION 1: CUSTOMER ORDERS -->
-        <div id="ordersSection">
-            <div class="panel-header">
-                <div>
-                    <h2 class="panel-title" style="margin: 0;">Customer Live Orders</h2>
-                    <span style="font-size: 13px; color: #64748B;">Stored locally in browser localStorage.</span>
-                </div>
-                <div>
-                    <button class="refresh-btn" onclick="renderOrders()">↻ Refresh</button>
-                    <button class="clear-all-btn" onclick="clearAllOrders()">Clear All</button>
-                </div>
-            </div>
-            <div id="adminOrdersContainer"></div>
-        </div>
+    <script src="db.js"></script>
+    <script>
+        // Render Admin Tables on Load
+        document.addEventListener("DOMContentLoaded", () => {
+            loadAdminData();
+        });
 
-        <!-- SECTION 2: MILK DONORS -->
-        <div id="donorsSection" style="display: none;">
-            <div class="panel-header">
-                <div>
-                    <h2 class="panel-title" style="margin: 0;">Milk Donor Applications</h2>
-                    <span style="font-size: 13px; color: #64748B;">Stored locally in browser localStorage.</span>
-                </div>
-                <div>
-                    <button class="refresh-btn" onclick="renderDonors()">↻ Refresh</button>
-                    <button class="clear-all-btn" onclick="clearAllDonors()">Clear All</button>
-                </div>
-            </div>
-            <div id="adminDonorsContainer"></div>
-        </div>
-    </div>
-</div>
-
-<script>
-    let currentTab = 'orders';
-
-    function switchTab(tab) {
-        currentTab = tab;
-        if (tab === 'orders') {
-            document.getElementById('ordersSection').style.display = 'block';
-            document.getElementById('donorsSection').style.display = 'none';
-            document.getElementById('tabOrdersBtn').classList.add('active');
-            document.getElementById('tabDonorsBtn').classList.remove('active');
-            renderOrders();
-        } else {
-            document.getElementById('ordersSection').style.display = 'none';
-            document.getElementById('donorsSection').style.display = 'block';
-            document.getElementById('tabOrdersBtn').classList.remove('active');
-            document.getElementById('tabDonorsBtn').classList.add('active');
-            renderDonors();
-        }
-    }
-
-    function renderOrders() {
-        const container = document.getElementById('adminOrdersContainer');
-        const orders = JSON.parse(localStorage.getItem('umma_orders')) || [];
-
-        if (orders.length === 0) {
-            container.innerHTML = `<div class="empty-state"><h3>No Customer Orders Found</h3><p>When customers place orders from index.html, they will appear here.</p></div>`;
-            return;
-        }
-
-        container.innerHTML = orders.map((order, index) => `
-            <div class="admin-card">
-                <div class="admin-card-header">
-                    <div>
-                        <span class="tracking-id">${order.id}</span>
-                        <span style="font-size: 12px; color: #64748B; margin-left: 10px;">Placed: ${order.date}</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <label style="font-size: 13px; font-weight: 700; color: #112A61;">Status:</label>
-                        <select class="status-select" onchange="updateOrderStatus(${index}, this.value)">
-                            <option value="Order Received" ${order.status === 'Order Received' ? 'selected' : ''}>Order Received</option>
-                            <option value="Preparing" ${order.status === 'Preparing' ? 'selected' : ''}>Preparing</option>
-                            <option value="In Transit" ${order.status === 'In Transit' ? 'selected' : ''}>In Transit</option>
+        function loadAdminData() {
+            // Render Orders
+            const ordersTableBody = document.querySelector("#orders-table tbody");
+            ordersTableBody.innerHTML = "";
+            const orders = db.getOrders();
+            orders.forEach(order => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${order.id}</td>
+                    <td>${order.customerName}</td>
+                    <td>${order.product}</td>
+                    <td>${order.phone}</td>
+                    <td>${order.address}</td>
+                    <td>
+                        <select onchange="updateOrderStatus('${order.id}', this.value)">
+                            <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                            <option value="Dispatched" ${order.status === 'Dispatched' ? 'selected' : ''}>Dispatched</option>
                             <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
                         </select>
-                        <button class="delete-single-btn" onclick="deleteSingleOrder(${index})">✕ Delete</button>
-                    </div>
-                </div>
-                <div class="info-body">
-                    <p style="margin: 4px 0;"><strong>Customer Name:</strong> ${order.customerName} | <strong>Phone:</strong> ${order.phone}</p>
-                    <p style="margin: 4px 0;"><strong>Product Ordered:</strong> ${order.productName} (${order.quantity})</p>
-                    <p style="margin: 4px 0; color: #112A61;"><strong>Delivery Address:</strong> ${order.address}</p>
-                </div>
-            </div>
-        `).join('');
-    }
+                    </td>
+                    <td><button onclick="removeOrder('${order.id}')">Delete</button></td>
+                `;
+                ordersTableBody.appendChild(row);
+            });
 
-    function updateOrderStatus(index, newStatus) {
-        let orders = JSON.parse(localStorage.getItem('umma_orders')) || [];
-        if (orders[index]) {
-            orders[index].status = newStatus;
-            localStorage.setItem('umma_orders', JSON.stringify(orders));
-        }
-    }
-
-    function deleteSingleOrder(index) {
-        if (confirm('Are you sure you want to delete this order?')) {
-            let orders = JSON.parse(localStorage.getItem('umma_orders')) || [];
-            orders.splice(index, 1);
-            localStorage.setItem('umma_orders', JSON.stringify(orders));
-            renderOrders();
-        }
-    }
-
-    function clearAllOrders() {
-        if (confirm('Are you sure you want to clear all customer orders?')) {
-            localStorage.removeItem('umma_orders');
-            renderOrders();
-        }
-    }
-
-    function renderDonors() {
-        const container = document.getElementById('adminDonorsContainer');
-        const donors = JSON.parse(localStorage.getItem('umma_donors')) || [];
-
-        if (donors.length === 0) {
-            container.innerHTML = `<div class="empty-state"><h3>No Donor Applications Found</h3><p>When mothers apply via index.html, their details will show up here.</p></div>`;
-            return;
-        }
-
-        container.innerHTML = donors.map((donor, index) => `
-            <div class="admin-card">
-                <div class="admin-card-header">
-                    <div>
-                        <span class="donor-id">${donor.id}</span>
-                        <span style="font-size: 12px; color: #64748B; margin-left: 10px;">Applied: ${donor.date}</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <label style="font-size: 13px; font-weight: 700; color: #112A61;">Status:</label>
-                        <select class="status-select" onchange="updateDonorStatus(${index}, this.value)">
-                            <option value="Pending Collection" ${donor.status === 'Pending Collection' ? 'selected' : ''}>Pending Collection</option>
+            // Render Donors
+            const donorsTableBody = document.querySelector("#donors-table tbody");
+            donorsTableBody.innerHTML = "";
+            const donors = db.getDonors();
+            donors.forEach(donor => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${donor.id}</td>
+                    <td>${donor.name}</td>
+                    <td>${donor.phone}</td>
+                    <td>${donor.volume}</td>
+                    <td>${donor.address}</td>
+                    <td>
+                        <select onchange="updateDonorStatus('${donor.id}', this.value)">
+                            <option value="Under Review" ${donor.status === 'Under Review' ? 'selected' : ''}>Under Review</option>
+                            <option value="Approved" ${donor.status === 'Approved' ? 'selected' : ''}>Approved</option>
                             <option value="Collected" ${donor.status === 'Collected' ? 'selected' : ''}>Collected</option>
                         </select>
-                        <button class="delete-single-btn" onclick="deleteSingleDonor(${index})">✕ Delete</button>
-                    </div>
-                </div>
-                <div class="info-body">
-                    <p style="margin: 4px 0;"><strong>Donor Name:</strong> ${donor.name} | <strong>Phone:</strong> ${donor.phone}</p>
-                    <p style="margin: 4px 0;"><strong>Estimated Volume:</strong> ${donor.volume} | <strong>Expression Date:</strong> ${donor.exprDate}</p>
-                    <p style="margin: 4px 0; color: #112A61;"><strong>Pickup Address:</strong> ${donor.address}</p>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    function updateDonorStatus(index, newStatus) {
-        let donors = JSON.parse(localStorage.getItem('umma_donors')) || [];
-        if (donors[index]) {
-            donors[index].status = newStatus;
-            localStorage.setItem('umma_donors', JSON.stringify(donors));
+                    </td>
+                    <td><button onclick="removeDonor('${donor.id}')">Delete</button></td>
+                `;
+                donorsTableBody.appendChild(row);
+            });
         }
-    }
 
-    function deleteSingleDonor(index) {
-        if (confirm('Are you sure you want to delete this donor application?')) {
-            let donors = JSON.parse(localStorage.getItem('umma_donors')) || [];
-            donors.splice(index, 1);
-            localStorage.setItem('umma_donors', JSON.stringify(donors));
-            renderDonors();
+        function updateOrderStatus(id, status) {
+            db.updateOrderStatus(id, status);
         }
-    }
 
-    function clearAllDonors() {
-        if (confirm('Are you sure you want to clear all donor applications?')) {
-            localStorage.removeItem('umma_donors');
-            renderDonors();
+        function updateDonorStatus(id, status) {
+            db.updateDonorStatus(id, status);
         }
-    }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        renderOrders();
-    });
-</script>
+        function removeOrder(id) {
+            if (confirm("Are you sure you want to delete this order?")) {
+                db.deleteOrder(id);
+                loadAdminData();
+            }
+        }
+
+        function removeDonor(id) {
+            if (confirm("Are you sure you want to delete this donor application?")) {
+                db.deleteDonor(id);
+                loadAdminData();
+            }
+        }
+    </script>
 </body>
 </html>
