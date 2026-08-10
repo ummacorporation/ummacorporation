@@ -1,3 +1,7 @@
+<!-- ================================================================================= -->
+<!-- UPDATED admin.html: Dynamically extracts the exact seller name from index.html     -->
+<!-- (e.g., Sarah, Bea, Maria) based on who the customer ordered from.                 -->
+<!-- ================================================================================= -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -233,6 +237,26 @@
             color: #4A5568;
         }
 
+        .location-highlight {
+            background: #EDF5FF;
+            border-left: 4px solid #4A90E2;
+            padding: 8px 12px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 8px;
+            font-size: 13.5px;
+            color: #112A61;
+        }
+
+        .seller-highlight {
+            background: #FDF2F4;
+            border-left: 4px solid #E25C80;
+            padding: 8px 12px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 8px;
+            font-size: 13.5px;
+            color: #7A1C35;
+        }
+
         .empty-state {
             text-align: center;
             padding: 50px 20px;
@@ -269,7 +293,7 @@
             <div class="panel-header">
                 <div>
                     <h2 class="panel-title">Customer Live Orders</h2>
-                    <span style="font-size: 13px; color: #64748B;">Update delivery status or delete single completed/invalid orders.</span>
+                    <span style="font-size: 13px; color: #64748B;">Showing the exact seller (e.g., Sarah, Bea, Maria) from index.html checkout.</span>
                 </div>
                 <div>
                     <button class="refresh-btn" onclick="renderOrders()">↻ Refresh</button>
@@ -320,39 +344,52 @@ function switchTab(tab) {
 /* CUSTOMER ORDERS LOGIC */
 function renderOrders() {
     const container = document.getElementById('adminOrdersContainer');
-    const orders = JSON.parse(localStorage.getItem('umma_orders') || '[]');
+    let orders = JSON.parse(localStorage.getItem('umma_orders') || '[]');
 
     if (orders.length === 0) {
-        container.innerHTML = `<div class="empty-state"><h3>No Customer Orders Found</h3><p>When customers place orders, they will automatically appear here.</p></div>`;
+        container.innerHTML = `<div class="empty-state"><h3>No Customer Orders Found</h3><p>When customers place orders from index.html, they will automatically appear here.</p></div>`;
         return;
     }
 
-    container.innerHTML = orders.map(order => `
-        <div class="admin-card">
-            <div class="admin-card-header">
-                <div>
-                    <span class="tracking-id">${order.id}</span>
-                    <span style="font-size: 12px; color: #64748B; margin-left: 10px;">Placed: ${order.date}</span>
+    container.innerHTML = orders.map(order => {
+        // Retrieve exact seller name stored from index.html during checkout
+        let seller = order.sellerName || order.seller || order.hub || order.assignedSeller || 'Unassigned';
+
+        return `
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <div>
+                        <span class="tracking-id">${order.id}</span>
+                        <span style="font-size: 12px; color: #64748B; margin-left: 10px;">Placed: ${order.date || 'Recent'}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <label style="font-size: 13px; font-weight: 700; color: #112A61;">Status:</label>
+                        <select class="status-select" onchange="updateOrderStatus('${order.id}', this.value)">
+                            <option value="Order Received" ${order.status === 'Order Received' ? 'selected' : ''}>Order Received</option>
+                            <option value="Preparing" ${order.status === 'Preparing' ? 'selected' : ''}>Preparing</option>
+                            <option value="In Transit" ${order.status === 'In Transit' ? 'selected' : ''}>In Transit</option>
+                            <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                        </select>
+                        <button class="delete-single-btn" onclick="deleteSingleOrder('${order.id}')">✕ Delete Order</button>
+                    </div>
                 </div>
-                <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
-                    <label style="font-size: 13px; font-weight: 700; color: #112A61;">Status:</label>
-                    <select class="status-select" onchange="updateOrderStatus('${order.id}', this.value)">
-                        <option value="Order Received" ${order.status === 'Order Received' ? 'selected' : ''}>Order Received</option>
-                        <option value="Preparing" ${order.status === 'Preparing' ? 'selected' : ''}>Preparing</option>
-                        <option value="In Transit" ${order.status === 'In Transit' ? 'selected' : ''}>In Transit</option>
-                        <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
-                    </select>
-                    <button class="delete-single-btn" onclick="deleteSingleOrder('${order.id}')">✕ Delete Order</button>
+                <div class="info-body">
+                    <p style="margin: 4px 0;"><strong>Customer Name:</strong> ${order.customerName} | <strong>Phone:</strong> ${order.phone}</p>
+                    <p style="margin: 4px 0;"><strong>Product Ordered:</strong> ${order.productName} (${order.quantity})</p>
+                    
+                    <!-- Displays the exact seller saved from index.html (e.g. Sarah, Bea, Maria) -->
+                    <div class="seller-highlight">
+                        🛒 <strong>Assigned Seller:</strong> ${seller}
+                    </div>
+
+                    <!-- Specific Customer Pinned Location -->
+                    <div class="location-highlight">
+                        📍 <strong>Customer Delivery Location (Pinned):</strong> ${order.address}
+                    </div>
                 </div>
             </div>
-            <div class="info-body">
-                <p style="margin: 4px 0;"><strong>Customer Name:</strong> ${order.customerName} | <strong>Phone:</strong> ${order.phone}</p>
-                <p style="margin: 4px 0;"><strong>Product Ordered:</strong> ${order.productName} (${order.quantity})</p>
-                <p style="margin: 4px 0;"><strong>Supplier Hub:</strong> ${order.hub}</p>
-                <p style="margin: 4px 0; color: #112A61;"><strong>Delivery Target Address:</strong> ${order.address}</p>
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function updateOrderStatus(id, newStatus) {
@@ -400,7 +437,7 @@ function renderDonors() {
                 <div class="admin-card-header">
                     <div>
                         <span class="donor-id">${donor.id}</span>
-                        <span style="font-size: 12px; color: #64748B; margin-left: 10px;">Applied: ${donor.date}</span>
+                        <span style="font-size: 12px; color: #64748B; margin-left: 10px;">Applied: ${donor.date || 'Recent'}</span>
                     </div>
                     <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
                         <label style="font-size: 13px; font-weight: 700; color: #112A61;">Donor Status:</label>
