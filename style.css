@@ -1,95 +1,156 @@
-* {
-    box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}
+/* ========================================== */
+/* UMMA style.css (Theme and Layout Styles)   */
+/* ========================================== */
 body {
-    background: radial-gradient(circle at 50% 30%, #E6F7FF 0%, #C4ECFF 70%, #B5E6FF 100%) fixed;
+    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    color: #1A365D;
+    background-color: #f9f9fb;
+    color: #333;
 }
-header {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    padding: 16px 40px;
+
+.navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid #BCE3FF;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    background-color: #4a90e2;
+    color: white;
+    padding: 1rem 2rem;
 }
-.logo {
-    font-size: 28px;
-    font-weight: 900;
-    color: #112A61;
+
+.navbar .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.nav-links {
+    list-style: none;
     display: flex;
-    align-items: center;
-    gap: 10px;
+    gap: 1.5rem;
+    margin: 0;
 }
-.logo .korean-text {
-    font-family: "Malgun Gothic", sans-serif;
-    font-size: 23px;
-    font-weight: 800;
-    color: #E25C80;
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
 }
-.main-container {
-    max-width: 800px;
-    margin: 40px auto;
-    padding: 0 20px;
+
+.nav-links a:hover {
+    text-decoration: underline;
 }
-.card {
-    background: #FFFFFF;
-    border-radius: 24px;
-    border: 2px solid #EAEFF5;
-    padding: 32px;
-    box-shadow: 0 12px 36px rgba(17, 42, 97, 0.08);
-    margin-bottom: 30px;
+
+main {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
 }
-h2 {
-    color: #112A61;
-    margin-top: 0;
+
+#hero {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: #eef2f7;
+    border-radius: 8px;
+    margin-bottom: 2rem;
 }
-.form-group {
-    margin-bottom: 15px;
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
 }
-label {
-    display: block;
-    font-weight: 700;
-    color: #112A61;
-    margin-bottom: 5px;
-    font-size: 14px;
+
+.product-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
 }
-input, select, textarea {
-    width: 100%;
-    padding: 10px 14px;
-    border-radius: 10px;
-    border: 2px solid #BCE3FF;
-    font-size: 14px;
-    outline: none;
-}
-input:focus, select:focus, textarea:focus {
-    border-color: #112A61;
-}
-.submit-btn {
-    background: #112A61;
-    color: #FFFFFF;
+
+.product-card button, button[type="submit"] {
+    background-color: #4a90e2;
+    color: white;
     border: none;
-    padding: 12px 20px;
-    font-weight: 800;
-    border-radius: 12px;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
     cursor: pointer;
+    font-weight: bold;
+}
+
+.product-card button:hover, button[type="submit"]:hover {
+    background-color: #357abd;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-weight: bold;
+}
+
+.form-group input, .form-group textarea, .form-group select {
     width: 100%;
-    font-size: 16px;
-    margin-top: 10px;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
 }
-.submit-btn:hover {
-    background: #1A365D;
+
+/* Modal styling */
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
 }
-.donor-btn {
-    background: #E25C80;
+
+.modal-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 2rem;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 8px;
+    position: relative;
 }
-.donor-btn:hover {
-    background: #C5486B;
+
+.close {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+/* Admin Tables */
+.admin-container section {
+    margin-bottom: 3rem;
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+table th, table td {
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    text-align: left;
+}
+
+table th {
+    background-color: #f1f1f1;
 }
